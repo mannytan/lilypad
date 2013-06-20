@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<html>
+
+<head>
+	<title>uncontrol :: slicer</title>
+    <!-- css -->
+	<link type="text/css" href="./css/styles.css" rel="stylesheet"/>
+ 
+    <!-- utils -->
+	<script src="./vendor/jquery-1.7.1.min.js"></script>
+	<script src="./vendor/Stats.js"></script>
+	<script type="text/javascript" src="./vendor/RequestAnimationFrame.js"></script>
+    <script type="text/javascript" src="./vendor/jstween-1.0.min.js"></script>
+	<script type="text/javascript" src="./vendor/dat.gui.min.js"></script>
+
+    <!-- 3d -->
+	<script type="text/javascript" src="./vendor/three/Three.js"></script>
+
+    <!-- boilerplate -->
+	<script type="text/javascript" src="./vendor/un/BoilerPlate.js"></script>
+	<script type="text/javascript" src="./vendor/un/Trace.js"></script>
+	<script type="text/javascript" src="./vendor/un/Utils.js"></script>
+
+    <!-- custom -->
+	<script type="text/javascript" src="./js/Main.js"></script>
+	<script type="text/javascript" src="./js/Slicer3D.js"></script>
+
+	<script type="text/javascript" src="./js/modernizr.custom.31336.js"></script>
+	<script type="text/javascript">
+
+	$(document).ready(function() {
+
+		if(Modernizr.webgl) {
+			var slicer = new SLICER.Main();
+			slicer.init();
+		} else {
+			$('body').append('<img id="noWebGL" src="./img/noWebGL.png" />');
+		}
+	});
+
+	</script>
+
+</head>
+
+<body>
+
+<div id="container3D"></div>
+<div id="guiContainer"></div>
+<div id="proxyTimer"></div>
+<div id="proxy">
+	<div class="proxyItem"></div>
+</div>
+</body>
+
+</html>
