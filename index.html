@@ -15,7 +15,8 @@
 	<script type="text/javascript" src="./vendor/dat.gui.min.js"></script>
 
     <!-- 3d -->
-	<script type="text/javascript" src="./vendor/three/Three.js"></script>
+	<script type="text/javascript" src="./vendor/three/three.min.js"></script>
+	<script type="text/javascript" src="./vendor/three/controls/TrackballControls.js"></script>
 
     <!-- boilerplate -->
 	<script type="text/javascript" src="./vendor/un/BoilerPlate.js"></script>
@@ -23,6 +24,7 @@
 	<script type="text/javascript" src="./vendor/un/Utils.js"></script>
 
     <!-- custom -->
+	<script type="text/javascript" src="./js/Params.js"></script>
 	<script type="text/javascript" src="./js/Main.js"></script>
 	<script type="text/javascript" src="./js/Slicer3D.js"></script>
 
@@ -32,6 +34,7 @@
 	$(document).ready(function() {
 
 		if(Modernizr.webgl) {
+		$('#notification').html("Drop experiment<br>Loading 6.7MB MP3 ...")
 			var slicer = new SLICER.Main();
 			slicer.init();
 		} else {

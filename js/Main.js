@@ -6,7 +6,6 @@
 
 var SLICER = SLICER || {};
 
-SLICER.Params = {};
 
 SLICER.Main = function(name) {
 	var scope = this;
@@ -16,19 +15,18 @@ SLICER.Main = function(name) {
 	this.name = 'Main';
 	this.isPaused = false;
 
-	// dat.gui
-	this.gui = null;
-	this.guiWidth = 300;
-	this.guiContainer = null;
-
 	// stage
 	this.stageWidth = window.innerWidth - this.guiWidth;
 	this.stageHeight = window.innerHeight;
 	this.stageOffsetX = ((window.innerWidth - this.stageWidth) * 0.5) | 0;
 	this.stageOffsetY = ((window.innerHeight - this.stageHeight) * 0.5) | 0;
 
+	// dat.gui
+	this.gui = null;
+
 	// stats
 	this.stats = new Stats();
+	this.stats.domElement.style.position = 'absolute';
 
 	// 3d
 	this.slicer3D = null;
@@ -36,21 +34,22 @@ SLICER.Main = function(name) {
 	this.init = function() {
 		this.traceFunction("init");
 		this.createListeners();
-		this.createGui();
+
+		this.gui = new SLICER.Params("Params");
+		this.gui.createGui();
 
 		this.slicer3D = new SLICER.Slicer3D("Slicer3D");
 		this.slicer3D.init();
 		this.slicer3D.setDimensions(this.stageWidth,this.stageHeight);
 		this.slicer3D.createEnvironment();
-
 		this.slicer3D.createBackgroundElements();
 		this.slicer3D.createForegroundElements();
-
-		this.slicer3D.hideElements();
 		this.slicer3D.createListeners();
 
-		this.loader = document.getElementById('loader');
+		this.gui.set3DScope(this.slicer3D);
+		this.gui.createListeners();
 
+		this.loader = document.getElementById('loader');
 		document.body.appendChild(this.stats.domElement);
 
 		// stop the user getting a text cursor
@@ -63,38 +62,12 @@ SLICER.Main = function(name) {
 		return this;
 	};
 
-	this.createGui = function() {
-		SLICER.Params = {
-			speed: 4.0,
-			orbitSpeed: 0.0001,
-			osc: 0,
-
-			resetTrackBall: function(){
-				scope.slicer3D.resetTrackBall();
-			}
-
-		};
-
-		this.gui = new dat.GUI({
-			width: this.guiWidth,
-			autoPlace: false
-		});
-		this.guiContainer = this.gui.domElement;
-
-		this.gui.add(SLICER.Params, 'osc', 0.0, 0.1).step(0.0005);
-		this.gui.add(SLICER.Params, 'resetTrackBall');
-
-
-		this.guiContainer = document.getElementById('guiContainer');
-		this.guiContainer.appendChild(this.gui.domElement);
-	};
-
 
 	this.update = function() {
 
 		this.slicer3D.parse();
 		this.slicer3D.draw();
-
+		return this;
 	};
 
 	this.loop = function() {
@@ -107,30 +80,6 @@ SLICER.Main = function(name) {
 			scope.loop();
 		});
 		return this;
-	};
-
-	this.slider = function(gui, startValue, endValue, delayer) {
-		var obj = {
-			time: delayer,
-			duration: SLICER.Params.speed,
-			effect: 'easeOut',
-			start: startValue,
-			stop: endValue,
-			onFrame: function(element, state) {
-				gui.setValue(state.value);
-			}
-		};
-		return obj;
-	};
-
-	this.perspectiveToggle = function() {
-		if (SLICER.Params.perspective === false) {
-			SLICER.Params.perspective = true;
-			this.slicer3D.toPerspective();
-		} else {
-			SLICER.Params.perspective = false;
-			this.slicer3D.toOrthographic();
-		}
 	};
 
 	this.pausePlayToggle = function() {
@@ -151,8 +100,6 @@ SLICER.Main = function(name) {
 	this.pause = function() {
 		this.isPaused = true;
 		this.slicer3D.disableTrackBall();
-		if (this.source) this.source.disconnect();
-
 	};
 
 	this.createListeners = function() {
@@ -173,12 +120,14 @@ SLICER.Main = function(name) {
 	};
 
 	this.resize = function() {
-		this.stageWidth = window.innerWidth - this.guiWidth;
+		this.stageWidth = window.innerWidth - SLICER.Params.guiWidth;
 		this.stageHeight = window.innerHeight;
 
 		this.slicer3D.setDimensions(this.stageWidth,this.stageHeight);
 		this.slicer3D.resize();
 
+		this.stats.domElement.style.top = (10) + 'px';
+		this.stats.domElement.style.right = (SLICER.Params.guiWidth + 10) + 'px';
 
 	};
 
