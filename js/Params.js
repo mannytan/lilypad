@@ -26,7 +26,7 @@ SLICER.Params = function(name) {
 
 		SLICER.Params = {
 			orbitSpeed: 0.0001,
-			guiWidth: 300,
+			guiWidth: 150,
 			explode: 0,
 			speed: 3.25,
 			delay: 0.001,
