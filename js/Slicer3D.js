@@ -52,7 +52,7 @@ SLICER.Slicer3D = function(name) {
 		this.camera.position.y = 50;
 		this.camera.position.z = 400;
 
-		this.controls = new THREE.TrackballControls( this.camera );
+		this.controls = new THREE.TrackballControls( this.camera, document.getElementById('container3D'));
 		this.controls.rotateSpeed = 1.0;
 		this.controls.zoomSpeed = 1.2;
 		this.controls.panSpeed = 0.8;
@@ -163,103 +163,45 @@ function generateTexture() {
 
 
 
-		var i,
+		var i,j,id,
 			particle,
 			faceNormal;
+		var totalVSegments = 11;
+		var totalHSegments = 31;
 
-		this.points = [];
-		this.total = (this.totalVInc+1)*(this.totalHInc+1);
-		
-		// topPlane
-		geometry =  new THREE.PlaneGeometry( 200, 200 ,this.totalHInc,this.totalVInc);
-		geometry.dynamic = true;
-		material = new THREE.MeshBasicMaterial({color:0x000000, transparent: true, opacity:0.1, wireframe:true});
-		this.topPlane = new THREE.Mesh( geometry, material);
-		this.topPlane.doubleSided = false;
-		this.topPlane.flipSided = true;
-		this.base.add(this.topPlane);
-
-		//  -------------------------------------
-		//  draw center line
-		//  -------------------------------------
-		var directionVector = new THREE.Vector3(-50, 100, -20);
-		var offsetVector = new THREE.Vector3(-10, 20, 10);
-
-		material = new THREE.LineBasicMaterial({
-			color: 0x006600,
-			lineWidth: 1
-		});
+		// backbone dots
+		material = new THREE.ParticleBasicMaterial( { color: 0x660066, size: 3} );
 		geometry = new THREE.Geometry();
-		geometry.vertices.push(
-			offsetVector, 
-			directionVector
-		);
-		var line = new THREE.Line(geometry, material);
-		line.type = THREE.Lines;
+		for(i = 0; i < totalVSegments; i++) {
+			geometry.vertices.push(new THREE.Vector3());
+		}
+		for(i = 0; i < totalVSegments; i++) {
+			geometry.vertices[i].x = 0;
+			geometry.vertices[i].y = i/totalVSegments * 200 - 100;
+			geometry.vertices[i].z = 0;
+		}
+		particles = new THREE.ParticleSystem( geometry, material );
+		this.base.add(particles);
+
+		// backbone line
+		geometry = new THREE.Geometry();
+		for(i = 0; i < totalVSegments; i++) {
+			geometry.vertices.push(particles.geometry.vertices[i].clone());
+		}
+		material = new THREE.LineBasicMaterial({ color: 0x660000, transparent:true, opacity: 0.25 });
+		line = new THREE.Line(geometry, material);
 		this.base.add(line);
-
-
-		// planar
-		geometry =  new THREE.PlaneGeometry( 100, 100 ,this.totalHInc,this.totalVInc);
-		geometry.dynamic = true;
-		material = new THREE.MeshBasicMaterial({color:0x006600, transparent: true, opacity:0.5, wireframe:true});
-		var planar = null;
-		planar = new THREE.Mesh( geometry, material);
-		planar.doubleSided = false;
-		planar.flipSided = true;
-		this.base.add(planar);
-
-		planar.position = (offsetVector);
-		planar.lookAt(directionVector);
-
-
-
-		// custom mesh created
-		geometry = new THREE.Geometry()
-		geometry.vertices.push( new THREE.Vector3( -50,  50, 30 ) ); // 0
-		geometry.vertices.push( new THREE.Vector3( -100, -50, -50 ) ); // 1
-		geometry.vertices.push( new THREE.Vector3(  50, -50, 50 ) ); // 2
-		geometry.vertices.push( new THREE.Vector3(  100, -100, 20 ) ); // 3
-		geometry.faces.push( new THREE.Face3( 0, 1, 2 ) );
-		// geometry.computeBoundingSphere();
-
-		material = new THREE.MeshBasicMaterial({color:0xFF0000, transparent: true, opacity:1.0, wireframe:true});
-
-
-		var texture = new THREE.Texture( generateTexture() );
-		texture.needsUpdate = true;
-
-		var materials = [];
-
-		materials.push( new THREE.MeshLambertMaterial( { map: texture, transparent: true } ) );
-		materials.push( new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.FlatShading } ) );
-		materials.push( new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } ) );
-		materials.push( new THREE.MeshNormalMaterial( ) );
-		materials.push( new THREE.MeshBasicMaterial( { color: 0xffaa00, transparent: true, blending: THREE.AdditiveBlending } ) );
-
-		materials.push( new THREE.MeshBasicMaterial( { color: 0xff0000, blending: THREE.SubtractiveBlending } ) );
-		materials.push( new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.SmoothShading } ) );
-		materials.push( new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.SmoothShading, map: texture, transparent: true } ) );
-		materials.push( new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } ) );
-		materials.push( new THREE.MeshBasicMaterial( { color: 0xffaa00, wireframe: true } ) );
-
-		materials.push( new THREE.MeshDepthMaterial() );
-		materials.push( new THREE.MeshDepthMaterial( { shading: THREE.SmoothShading } ) );
-		materials.push( new THREE.MeshLambertMaterial( { color: 0x666666, emissive: 0xff0000, ambient: 0x000000, shading: THREE.SmoothShading } ) );
-		materials.push( new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x666666, emissive: 0xff0000, ambient: 0x000000, shininess: 10, shading: THREE.SmoothShading, opacity: 0.9, transparent: true } ) );
-		materials.push( new THREE.MeshBasicMaterial( { map: texture, transparent: true } ) );
-
 
 		var tri = new THREE.Mesh( geometry, material);
 		this.base.add(tri);
 
-		geometry02 = new THREE.CylinderGeometry( 150, 200, 75, 100, 20, true);
-		material02 = new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.FlatShading } );		
+		// totalHSegments accounts for duplicate wrap around
+		geometry02 = new THREE.CylinderGeometry( 40, 40, 100, totalHSegments-1, totalVSegments-1, true);
+		material02 = new THREE.MeshLambertMaterial( { color: 0x996633, shading:THREE.FlatShading, wireframe:false,transparent:false,opacity:.25} );
 		material02.side = THREE.DoubleSide;
 		cylinder02 = new THREE.Mesh( geometry02, material02 );
 		this.base.add(cylinder02);
 
-		trace(		cylinder02.material.needsUpdate)
 	};
 
 	this.createListeners = function() {
@@ -271,12 +213,47 @@ function generateTexture() {
 	this.parse = function() {
 		this.base.rotation.z += SLICER.Params.orbitSpeed;
 
+		var totalVSegments = 11;
+		var totalHSegments = 31;
+
+		var percentage;
+		var xPos, ypos, zPos;
+		id = 0;
+
+		var radius = 100 - SLICER.Params.explode;
+		for(j = 0; j < totalVSegments; j++) {
+			for(i = 0; i < totalHSegments; i++) {
+				percentage = i/(totalHSegments-1);
+				xPos =  Math.cos(percentage*Math.PI*2) *100;
+				yPos = j/totalVSegments * 200 - 100;
+				zPos =  Math.sin(percentage*Math.PI*2) *100;
+
+				if(i%2==1 && j%4==0){
+					xPos =  Math.cos(percentage*Math.PI*2) *radius;
+					zPos =  Math.sin(percentage*Math.PI*2) *radius;
+				}
+
+				if(i%2==0 && j%4==2){
+					xPos =  Math.cos(percentage*Math.PI*2) *radius;
+					zPos =  Math.sin(percentage*Math.PI*2) *radius;
+				}
+
+				cylinder02.geometry.vertices[id].x = xPos;
+				cylinder02.geometry.vertices[id].y = yPos;
+				cylinder02.geometry.vertices[id].z = zPos;
+				id++;
+			}
+		}
+
+
+
+
 		this.count+=0.0125;
 
 	};
 
 	this.draw = function() {
-
+/*
 		var i,
 			particle,
 			pointsTotal = this.points.length;
@@ -289,12 +266,11 @@ function generateTexture() {
 			cylinder02.geometry.vertices[i].y += Math.random()*inc-incHalf;
 			cylinder02.geometry.vertices[i].z += Math.random()*inc-incHalf;
 		}
+*/
 		cylinder02.geometry.verticesNeedUpdate = true;
-
 		this.controls.update();
 		this.renderer.render(this.scene, this.camera);
 	};
-
 
 	this.enableTrackBall = function() {
 		this.controls.enabled = true;

@@ -26,82 +26,10 @@ SLICER.Params = function(name) {
 
 		SLICER.Params = {
 			orbitSpeed: 0.0001,
-			guiWidth: 150,
-			explode: 0,
+			guiWidth: 250,
+			explode: 20,
 			speed: 3.25,
-			delay: 0.001,
-
-			audioHistoryArray:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] ,
-			audioFFTRange:36,
-			audioFFTOffset:12,
-			audioFFTSmoothness:.1,
-
-			displayFanBlade: false,
-			displayFanBladeRim: false,
-			displayMenderParticle: false,
-			displayMeanderLines: true,
-			displayMeanderLineSegments: false,
-			displayMeanderLineHair: false,
-			displayMeanderDroplet: true,
-			displayCenterLine: true,
-			displaySurface: false,
-
-			centerLineSmoothness: 2,
-			centerLineSpeed: 0.001,
-			centerLineRange: 400,
-			centerLineDistance: 600,
-			centerLineXMultiplier: 1,
-			centerLineYMultiplier: 1,
-			centerLineZMultiplier: 2,
-			centerLineRandomize: function(){
-				scope.randomizeSomeValues(0);
-			},
-
-			meanderParticlesSmoothness: 6,
-			meanderParticlesSpeed: 0.001,
-			meanderParticlesRange: 500,
-			meanderParticlesOffset: 3,
-			meanderParticlesRangeTwistiness: 0, //.5
-			meanderParticlesRangeDistribution: .5,
-			meanderParticlesType: "random",
-			meanderParticlesRandomize: function(){
-				scope.randomizeSomeValues(1);
-			},
-
-			fanSpeed: 0.0004,
-			fanRange: 10,
-			fanType: "random",
-			fanRandomize: function(){
-				scope.randomizeSomeValues(2);
-			},
-			dropA: 4, //.5
-			dropB: .5, //.5
-			dropC: .25, //.5
-			dropSpeed: .001,
-			dropRandomize: function(){
-				scope.randomizeSomeValues(3);
-			},
-			explodeView: function(){
-				scope.explodeView();
-			},
-			dropletsView: function(){
-				scope.dropletsView();
-			},
-			dnaView: function(){
-				scope.dnaView();
-			},
-			surfaceView: function(){
-				scope.surfaceView();
-			},
-			wireView: function(){
-				scope.wireView();
-			},
-			allView: function(){
-				scope.allView();
-			},
-			randomizeAllValues: function(){
-				scope.randomizeAllValues();
-			}
+			delay: 0.001
 
 		};
 
@@ -116,74 +44,7 @@ SLICER.Params = function(name) {
 			return false;
 		};
 
-		var viewGUI = this.gui.addFolder('VIEWS (depreciated)');
-		var controlGUI = this.gui.addFolder('CONTROLS');
-
-		var gerneralGUI = controlGUI.addFolder('GENERAL');
-		var shapesGUI = controlGUI.addFolder('SHAPES');
-		var centerGUI = controlGUI.addFolder('CENTER LINE');
-		var meanderGUI = controlGUI.addFolder('MEANDER PARTICLE');
-		var fanGUI = controlGUI.addFolder('FAN');
-		var dropletGUI = controlGUI.addFolder('SLICERLETS');
-
-		SLICER.Sliders.explodeView = viewGUI.add(SLICER.Params, 'explodeView').name('EXPLODE VIEW');
-		SLICER.Sliders.dropletsView = viewGUI.add(SLICER.Params, 'dropletsView').name('SLICERLETS VIEW');
-		SLICER.Sliders.dropletsView = viewGUI.add(SLICER.Params, 'dnaView').name('DNA VIEW');
-		SLICER.Sliders.surfaceView = viewGUI.add(SLICER.Params, 'surfaceView').name('SURFACE VIEW');
-		SLICER.Sliders.wireView = viewGUI.add(SLICER.Params, 'wireView').name('WIRE VIEW');
-		SLICER.Sliders.allView = viewGUI.add(SLICER.Params, 'allView').name('VIEW ALL');
-
-		SLICER.Sliders.displayCenterLine = shapesGUI.add(SLICER.Params, 'displayCenterLine').name('center line');
-		SLICER.Sliders.displayMenderParticle = shapesGUI.add(SLICER.Params, 'displayMenderParticle').name('meander particle');
-		SLICER.Sliders.displayMeanderLines = shapesGUI.add(SLICER.Params, 'displayMeanderLines').name('meander lines');
-		SLICER.Sliders.displayMeanderLineSegments = shapesGUI.add(SLICER.Params, 'displayMeanderLineSegments').name('meander segments');
-		SLICER.Sliders.displayMeanderLineHair = shapesGUI.add(SLICER.Params, 'displayMeanderLineHair').name('meander hair');
-		SLICER.Sliders.displayMeanderDroplet = shapesGUI.add(SLICER.Params, 'displayMeanderDroplet').name('droplet');
-		SLICER.Sliders.displaySurface = shapesGUI.add(SLICER.Params, 'displaySurface').name('surface');
-		SLICER.Sliders.displayFanBlade = shapesGUI.add(SLICER.Params, 'displayFanBlade').name('fan');
-		SLICER.Sliders.displayFanBladeRim = shapesGUI.add(SLICER.Params, 'displayFanBladeRim').name('fanRim');
-		SLICER.Sliders.fanType = shapesGUI.add(SLICER.Params, 'fanType', ['unified', 'distributed', 'random']).name('fan type');
-		SLICER.Sliders.meanderParticlesType = shapesGUI.add(SLICER.Params, 'meanderParticlesType', ['unified', 'random']).name('meander type');
-
-		SLICER.Sliders.explode = gerneralGUI.add(SLICER.Params, 'explode', 0.0, 2000).step(0.0005).name('explode');
-		SLICER.Sliders.speed = gerneralGUI.add(SLICER.Params, 'speed', 0.1, 5.0).step(0.0005).name('speed');
-		SLICER.Sliders.delay = gerneralGUI.add(SLICER.Params, 'delay', 0.0, 5.0).step(0.0005).name('delay');
-
-		SLICER.Sliders.centerLineSmoothness = centerGUI.add(SLICER.Params, 'centerLineSmoothness', 0.0, 4).step(0.0005).name('smoothness');
-		SLICER.Sliders.centerLineSpeed = centerGUI.add(SLICER.Params, 'centerLineSpeed', -0.005, 0.005).step(0.0005).name('speed');
-		SLICER.Sliders.centerLineRange = centerGUI.add(SLICER.Params, 'centerLineRange', 400, 600).step(1).name('range');
-		SLICER.Sliders.centerLineDistance = centerGUI.add(SLICER.Params, 'centerLineDistance', 800, 1400).step(0.0005).name('distance');
-		SLICER.Sliders.centerLineXMultiplier = centerGUI.add(SLICER.Params, 'centerLineXMultiplier', 1.0, 2).step(0.0005).name('x multipier');
-		SLICER.Sliders.centerLineYMultiplier = centerGUI.add(SLICER.Params, 'centerLineYMultiplier', 1.0, 2).step(0.0005).name('y multipier');
-		SLICER.Sliders.centerLineZMultiplier = centerGUI.add(SLICER.Params, 'centerLineZMultiplier', 1.0, 2).step(0.0005).name('z multipier');
-		SLICER.Sliders.centerLineRandomize = centerGUI.add(SLICER.Params, 'centerLineRandomize').name('RANDOMIZE GROUP');
-
-		SLICER.Sliders.meanderParticlesSmoothness = meanderGUI.add(SLICER.Params, 'meanderParticlesSmoothness', 0.0, 6).step(0.0005).name('smoothness');
-		SLICER.Sliders.meanderParticlesSpeed = meanderGUI.add(SLICER.Params, 'meanderParticlesSpeed', -0.005, 0.005).step(0.0005).name('speed');
-		SLICER.Sliders.meanderParticlesRange = meanderGUI.add(SLICER.Params, 'meanderParticlesRange', 200, 500).step(0.0005).name('range');
-		SLICER.Sliders.meanderParticlesOffset = meanderGUI.add(SLICER.Params, 'meanderParticlesOffset', 0, 50).step(0.0005).name('offset');
-		SLICER.Sliders.meanderParticlesRangeTwistiness = meanderGUI.add(SLICER.Params, 'meanderParticlesRangeTwistiness', 0.0, 1.5).step(0.0005).name('twistiness');
-		SLICER.Sliders.meanderParticlesRangeDistribution = meanderGUI.add(SLICER.Params, 'meanderParticlesRangeDistribution', 0.0, 1.0).step(0.0005).name('distribution');
-		SLICER.Sliders.meanderParticlesRandomize = meanderGUI.add(SLICER.Params, 'meanderParticlesRandomize').name('RANDOMIZE GROUP');
-
-		// SLICER.Sliders.fanSpeed = fanGUI.add(SLICER.Params, 'fanSpeed', -0.0025, 0.0025).step(0.0001).name('fanSpeed');
-		SLICER.Sliders.fanSpeed = fanGUI.add(SLICER.Params, 'fanSpeed', 0.0, 0.00125).step(0.0001).name('fanSpeed');
-		SLICER.Sliders.fanRange = fanGUI.add(SLICER.Params, 'fanRange', 2, 20).step(1).name('fanRange');
-		SLICER.Sliders.fanRandomize = fanGUI.add(SLICER.Params, 'fanRandomize').name('RANDOMIZE');
-
-		SLICER.Sliders.dropSpeed = dropletGUI.add(SLICER.Params, 'dropSpeed', -0.0125, 0.0125).step(0.0005).name('speed');
-		SLICER.Sliders.dropA = dropletGUI.add(SLICER.Params, 'dropA', 0.5, 20.0).step(0.0005).name('a');
-		SLICER.Sliders.dropB = dropletGUI.add(SLICER.Params, 'dropB', 0.0, 1.0).step(0.0005).name('b');
-		SLICER.Sliders.dropC = dropletGUI.add(SLICER.Params, 'dropC', 0.0, 1.0).step(0.0005).name('c');
-		SLICER.Sliders.dropRandomize = dropletGUI.add(SLICER.Params, 'dropRandomize').name('RANDOMIZE GROUP');
-
-		shapesGUI.close();
-		gerneralGUI.close();
-		meanderGUI.close();
-		centerGUI.close();
-		dropletGUI.close();
-		fanGUI.close();
-		viewGUI.close();
+		this.gui.add(SLICER.Params, 'explode', -100, 100).step(0.0005).name('explode');
 
 		this.guiContainer = document.getElementById('guiContainer');
 		this.guiContainer.appendChild(this.gui.domElement);
@@ -192,28 +53,6 @@ SLICER.Params = function(name) {
 
 	};
 	this.createListeners = function(arg){
-
-		SLICER.Sliders.fanRange.onChange(function(value) {
-			scope.slicer3D.updateFan();
-		});
-
-		SLICER.Sliders.meanderParticlesType.onChange(function(value) {
-			if(value === 'unified') {
-				scope.slicer3D.setMeanderLinesToUnified();
-			} else if(value === 'random') {
-				scope.slicer3D.setMeanderLinesToRandom();
-			}
-		});
-
-		SLICER.Sliders.fanType.onChange(function(value) {
-			if(value === 'unified') {
-				scope.slicer3D.setFanToUnified();
-			} else if(value === 'distributed') {
-				scope.slicer3D.setFanToDistributed();
-			} else if(value === 'random') {
-				scope.slicer3D.setFanToRandom();
-			}
-		});
 
 		return this;
 
