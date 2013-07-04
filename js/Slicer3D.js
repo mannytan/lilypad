@@ -29,11 +29,12 @@ SLICER.Slicer3D = function(name) {
 
 
 	this.customPlanes = null;
+	this.customWirePlanes = null;
 
 
 	this.particles = null;
-	this.totalPlanesH = 8;
-	this.totalPlanesV = 1;
+	this.totalPlanesH = 32;
+	this.totalPlanesV = 6;
 	this.totalVerticesH = this.totalPlanesH*2 + 1;
 	this.totalVerticesV = this.totalPlanesV*2 + 1;
 	this.totalVertices = this.totalVerticesH * this.totalVerticesV;
@@ -68,12 +69,17 @@ SLICER.Slicer3D = function(name) {
 		this.controls.keys = [ 65, 83, 68 ];
 
 
+		this.scene.add( new THREE.AmbientLight( 0xFF0000 ) );
+
 		// create a point light
 		var pointLight = new THREE.PointLight(0xFFFFFF);
-		pointLight.position.set(200,200,200);
-
-		// add to the scene
+		pointLight.position.set(300,300,300);
 		this.scene.add(pointLight);
+
+		pointLight = new THREE.PointLight(0xFFFFFF);
+		pointLight.position.set(-300,300,-300);
+		this.scene.add(pointLight);
+
 
 		this.renderer = new THREE.WebGLRenderer({
 			antialias: true
@@ -148,8 +154,6 @@ SLICER.Slicer3D = function(name) {
 
 		var percentage;
 
-		var ifEvenVertValley;
-		var ifOddVertValley;
 		// backbone dots
 		material = new THREE.ParticleBasicMaterial( { color: 0x660066, size: 5} );
 		geometry = new THREE.Geometry();
@@ -164,8 +168,17 @@ SLICER.Slicer3D = function(name) {
 		// material = new THREE.ParticleBasicMaterial( { color: 0x6699FF, size: 10, wireframe:true} );
 		// material = new THREE.MeshBasicMaterial( { color: 0x6699FF, wireframe:true} );
 		// material = new THREE.MeshDepthMaterial( );
-		material = new THREE.MeshNormalMaterial( { color: 0x6699FF, shading: THREE.FlatShading,wireframe:true } )
-		// material = new THREE.MeshNormalMaterial( { color: 0x996633, shading:THREE.SmoothShading, wireframe:true} );
+		// material = new THREE.MeshNormalMaterial( { color: 0x996633, shading:THREE.SmoothShading, wireframe:false} );
+		// material = new THREE.MeshNormalMaterial( { color: 0x6699FF, wireframe:false, transparent:true, opacity:0.75, shading: THREE.FlatShading } )
+		material = new THREE.MeshLambertMaterial( { 
+			ambient: 0x030303, 
+			color: 0x6699FF, 
+			specular: 0x009900, 
+			shininess: 30, 
+			shading: THREE.FlatShading 
+		} );
+
+		// material = new THREE.MeshLambertMaterial( { color: 0x6699FF, wireframe:false, transparent:true, opacity:1.00, shading: THREE.FlatShading } );
 		material.side = THREE.DoubleSide;
 		this.customPlanes = [];
 		for(i = 0; i < this.totalPlanesV; i++) {
@@ -173,6 +186,16 @@ SLICER.Slicer3D = function(name) {
 			customPlane = new THREE.Mesh( geometry, material );
 			this.base.add(customPlane);
 			this.customPlanes.push(customPlane);
+		}
+
+		material = new THREE.MeshBasicMaterial( { color: 0xFFFFFF, wireframe:true, transparent:true, opacity:0.05, shading: THREE.FlatShading } )
+		material.side = THREE.DoubleSide;
+		this.customWirePlanes = [];
+		for(i = 0; i < this.totalPlanesV; i++) {
+			geometry = this.getCustomGeometry(this.totalPlanesH, i, i*30, 30);
+			customPlane = new THREE.Mesh( geometry, material );
+			this.base.add(customPlane);
+			this.customWirePlanes.push(customPlane);
 		}
 
 
@@ -256,31 +279,41 @@ SLICER.Slicer3D = function(name) {
 			geometry, 
 			material;
 
-		this.base.rotation.z += SLICER.Params.orbitSpeed;
-		var explode = SLICER.Params.explode;
-		var explodeVertical = SLICER.Params.explodeVertical;
+		this.base.rotation.y += SLICER.Params.orbitSpeed;
+		var multiplier = 10;
+		var explode = 200 - SLICER.Params.explode*200;
+		var explodeVertical = SLICER.Params.explode*multiplier;
 
 		geometry = this.particles.geometry;
 		id = 0;
-		var heightCounter = 0;
+		var heightCounter = -100;
 		var heightExtra = 0;
+		var ifOdd = null;
+		var ifEven = null;
 		for(j = 0; j < this.totalVerticesV; j++) {
 			for(i = 0; i < this.totalVerticesH; i++) {
+				// percentage = i/(this.totalVerticesH-1.0)*TWO_PI * ((1-SLICER.Params.explode) * 1.0 + 0.0 );
 				percentage = i/(this.totalVerticesH-1.0)*TWO_PI;
 
-				ifEvenVertValley = i%2==1 && j%4==0;
-				ifOddVertValley = i%2==0 && j%4==2;
+				ifOdd = i%2==1;
+				ifEven = i%2==0;
 
 				heightExtra = 0;
-				if(j%3==1 && i%2==1) {
+				if(ifEven && j%4==0){
+					heightExtra += explodeVertical;
+				} else if(ifEven && j%4==2){
+					heightExtra -= explodeVertical;
+				} else if(ifOdd && j%4==2){
+					heightExtra += explodeVertical;
+				} else if(ifOdd && j%4==0){
 					heightExtra -= explodeVertical;
 				}
-
-				if(ifEvenVertValley){
+				
+				if(ifEven && j%4==1 ){
 					geometry.vertices[id].x = Math.sin(percentage)*explode;
 					geometry.vertices[id].y = heightCounter+heightExtra;
 					geometry.vertices[id].z = Math.cos(percentage)*explode;
-				} else if(ifOddVertValley){
+				} else if(ifOdd && j%4==3){
 					geometry.vertices[id].x = Math.sin(percentage)*explode;
 					geometry.vertices[id].y = heightCounter+heightExtra;
 					geometry.vertices[id].z = Math.cos(percentage)*explode;
@@ -289,16 +322,12 @@ SLICER.Slicer3D = function(name) {
 					geometry.vertices[id].y = heightCounter+heightExtra;
 					geometry.vertices[id].z = Math.cos(percentage)*200;
 				}
+
 				id++;
 			}
 
-			heightCounter += 40;
+			heightCounter += (multiplier*2-SLICER.Params.explode*multiplier);
 		}
-
-
-
-
-
 
 		// redraw
 		// order is refactored to traverse from x -> y to y -> x
@@ -316,6 +345,8 @@ SLICER.Slicer3D = function(name) {
 					iOffset = j;
 					this.customPlanes[k].geometry.vertices[id].copy(
 						this.particles.geometry.vertices[kOffset + jOffset + iOffset]);
+					this.customWirePlanes[k].geometry.vertices[id].copy(
+						this.particles.geometry.vertices[kOffset + jOffset + iOffset]);
 					id++;
 				}
 			}
@@ -330,6 +361,8 @@ SLICER.Slicer3D = function(name) {
 		// update shapes
 		for(i = 0; i < this.customPlanes.length; i++) {
 			this.customPlanes[i].geometry.verticesNeedUpdate = true;
+			this.customWirePlanes[i].geometry.verticesNeedUpdate = true;
+
 		}
 		
 		
