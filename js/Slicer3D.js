@@ -34,8 +34,8 @@ SLICER.Slicer3D = function(name) {
 
 
 	this.particles = null;
-	this.totalPlanesH = 20;
-	this.totalPlanesV = 4;
+	this.totalPlanesH = 12;
+	this.totalPlanesV = 12;
 	this.totalVerticesH = this.totalPlanesH*2 + 1;
 	this.totalVerticesV = this.totalPlanesV*2 + 1;
 	this.totalVertices = this.totalVerticesH * this.totalVerticesV;
@@ -69,13 +69,12 @@ SLICER.Slicer3D = function(name) {
 		this.controls.dynamicDampingFactor = 0.3;
 		this.controls.keys = [ 65, 83, 68 ];
 
-
-		this.scene.add( new THREE.AmbientLight( 0xFF0000 ) );
+		this.scene.add( new THREE.AmbientLight( 0xCCCCCC ) );
 
 		var hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.6 );
 		hemiLight.color.setHSL( 0.6, 1, 0.6 );
 		hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
-		hemiLight.position.set( 0, 200, 0 );
+		hemiLight.position.set( 0, 300, 0 );
 		this.scene.add( hemiLight );
 
 		this.dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
@@ -103,25 +102,25 @@ SLICER.Slicer3D = function(name) {
 
 		var groundGeo = new THREE.PlaneGeometry( 1000, 1000 );
 		var groundMat = new THREE.MeshPhongMaterial( { ambient: 0xffffff, color: 0xffffff, specular: 0x050505 } );
-		groundMat.color.setHSL( 0.095, 1, 0.75 );
+		groundMat.color.setHSL( 0.000, .55, 1.0 );
 
 		var ground = new THREE.Mesh( groundGeo, groundMat );
 		ground.rotation.x = -Math.PI/2;
-		ground.position.y = -200;
+		ground.position.y = -100;
 		this.scene.add( ground );
 
 		ground.receiveShadow = true;
 
-
+/*
 		this.pointLightA = new THREE.PointLight(0xFFFFFF);
 		this.pointLightA.position.set(300,300,300);
-		// this.scene.add(this.pointLightA);
+		this.scene.add(this.pointLightA);
 
 
 		pointLight = new THREE.PointLight(0xFFFFFF);
 		pointLight.position.set(0,0,0);
-		// this.scene.add(pointLight);
-/*
+		this.scene.add(pointLight);
+
 		pointLight = new THREE.PointLight(0xFFFFFF);
 		pointLight.position.set(300,-300,-300);
 		this.scene.add(pointLight);
@@ -201,7 +200,6 @@ SLICER.Slicer3D = function(name) {
 
 	};
 
-
 	this.createForegroundElements = function() {
 
 		var i,j,k,id,
@@ -255,7 +253,7 @@ SLICER.Slicer3D = function(name) {
 		for(i = 0; i < this.totalPlanesV; i++) {
 			geometry = this.getCustomGeometry(this.totalPlanesH, i, i*30, 30);
 			customPlane = new THREE.Mesh( geometry, material );
-			// this.base.add(customPlane);
+			this.base.add(customPlane);
 			this.customWirePlanes.push(customPlane);
 		}
 
@@ -344,22 +342,49 @@ SLICER.Slicer3D = function(name) {
 		this.base.rotation.y += SLICER.Params.orbitSpeed;
 
 		var multiplier = SLICER.Params.explodeVertical;
-		var outerRadius = SLICER.Params.radius;
-		var explode = outerRadius - SLICER.Params.explode*outerRadius;
-		var explodeVertical = SLICER.Params.explode*multiplier;
 
-		var heightCountIncrement = (multiplier*2-SLICER.Params.explode*multiplier)
-		var heightCounter = -(this.totalVerticesV-1)*.5 * heightCountIncrement;
+		var centerRadius = SLICER.Params.centerRadius;
+
+		var outerRadius = SLICER.Params.radius;
+		var radiusRange = SLICER.Params.radiusRange;
+		
+		var fold = SLICER.Params.fold;
+
+		var explode = outerRadius - fold*outerRadius;
+		var explodeVertical = SLICER.Params.fold*multiplier;
+		var heightCountIncrement = (multiplier*2-SLICER.Params.fold*multiplier)
+		var heightCounter = -100; //-(this.totalVerticesV-1)*.5 * heightCountIncrement;
 		var heightExtra = 0;
 		var ifOdd = null;
 		var ifEven = null;
 
+		var centerX, centerY, centerZ;
 		geometry = this.particles.geometry;
 		id = 0;
+
+		var wrappOffset = 0;
+		var wrappMultiplier = (1-fold);
+		if(SLICER.Params.wrap===true){
+			wrappOffset += (1-fold) * 0.5 * TWO_PI;
+			wrappMultiplier = 1;
+		}
 		for(j = 0; j < this.totalVerticesV; j++) {
+
+			outerRadius = SLICER.Params.radius - j/(this.totalVerticesV-1)*radiusRange * SLICER.Params.radius;
+			explode = outerRadius - fold*outerRadius;
+			explodeVertical = fold*multiplier;
+			heightCountIncrement = (multiplier*2-fold*multiplier)
+
 			for(i = 0; i < this.totalVerticesH; i++) {
-				// percentage = i/(this.totalVerticesH-1.0)*TWO_PI * ((1-SLICER.Params.explode) * 1.0 + 0.0 );
-				percentage = i/(this.totalVerticesH-1.0)*TWO_PI;
+
+				// center radius motion
+				percentage = (j/this.totalVerticesV+this.count)*TWO_PI;
+				centerX = Math.cos(percentage)*centerRadius*j/this.totalVerticesV;
+				centerZ = Math.sin(percentage)*centerRadius*j/this.totalVerticesV;
+
+				// percentage = i/(this.totalVerticesH-1.0)*TWO_PI;
+
+				percentage = i/(this.totalVerticesH-1.0) * TWO_PI * wrappMultiplier - wrappOffset;
 
 				ifOdd = i%2==1;
 				ifEven = i%2==0;
@@ -376,17 +401,17 @@ SLICER.Slicer3D = function(name) {
 				}
 				
 				if(ifEven && j%4==1 ){
-					geometry.vertices[id].x = Math.sin(percentage)*explode;
+					geometry.vertices[id].x = Math.sin(percentage)*explode + centerX;
 					geometry.vertices[id].y = heightCounter+heightExtra;
-					geometry.vertices[id].z = Math.cos(percentage)*explode;
+					geometry.vertices[id].z = Math.cos(percentage)*explode + centerZ;
 				} else if(ifOdd && j%4==3){
-					geometry.vertices[id].x = Math.sin(percentage)*explode;
+					geometry.vertices[id].x = Math.sin(percentage)*explode + centerX;
 					geometry.vertices[id].y = heightCounter+heightExtra;
-					geometry.vertices[id].z = Math.cos(percentage)*explode;
+					geometry.vertices[id].z = Math.cos(percentage)*explode + centerZ;
 				} else {
-					geometry.vertices[id].x = Math.sin(percentage)*outerRadius;
+					geometry.vertices[id].x = Math.sin(percentage)*outerRadius + centerX;
 					geometry.vertices[id].y = heightCounter+heightExtra;
-					geometry.vertices[id].z = Math.cos(percentage)*outerRadius;
+					geometry.vertices[id].z = Math.cos(percentage)*outerRadius + centerZ;
 				}
 
 				id++;
@@ -424,8 +449,6 @@ SLICER.Slicer3D = function(name) {
 	this.draw = function() {
 
 		var percentage = this.count*.1*TWO_PI
-		// this.pointLightA.position.x = Math.sin(percentage)*400;
-		// this.pointLightA.position.z = Math.cos(percentage)*400;
 		this.dirLight.position.x = Math.cos(percentage)*100;
 		this.dirLight.position.z = Math.sin(percentage)*100;
 

@@ -26,11 +26,14 @@ SLICER.Params = function(name) {
 
 		SLICER.Params = {
 			orbitSpeed: 0.0015,
-			guiWidth: 300,
-			explode: .35,
-			radius: 200,
-			explodeVertical: 10,
+			guiWidth: 250,
+			fold: .35,
+			radius: 100,
+			radiusRange: .5,
+			centerRadius: 10,
+			explodeVertical: 5,
 			speed: 3.25,
+			wrap:true,
 			delay: 0.001
 
 		};
@@ -46,9 +49,12 @@ SLICER.Params = function(name) {
 			return false;
 		};
 
-		this.gui.add(SLICER.Params, 'explode', 0, 1).step(0.0005).name('explode');
-		this.gui.add(SLICER.Params, 'radius', 0, 1000).step(0.0005).name('radius');
-		this.gui.add(SLICER.Params, 'explodeVertical', 0, 20).step(0.0005).name('explodeVertical');
+		this.gui.add(SLICER.Params, 'fold', -1, 1).step(0.0005).name('fold');
+		this.gui.add(SLICER.Params, 'radius', 0, 200).step(0.0005).name('radius');
+		this.gui.add(SLICER.Params, 'radiusRange', 0, 1).step(0.0005).name('radiusRange');
+		this.gui.add(SLICER.Params, 'centerRadius', 0, 50).step(0.0005).name('centerRadius');
+		this.gui.add(SLICER.Params, 'explodeVertical', 0.1, 10).step(0.0005).name('explodeVertical');
+		this.gui.add(SLICER.Params, 'wrap').name('wrap');
 
 		this.guiContainer = document.getElementById('guiContainer');
 		this.guiContainer.appendChild(this.gui.domElement);
