@@ -27,14 +27,15 @@ SLICER.Slicer3D = function(name) {
 
 	this.count = 0;
 
+	this.pointLightA = null;
 
 	this.customPlanes = null;
 	this.customWirePlanes = null;
 
 
 	this.particles = null;
-	this.totalPlanesH = 32;
-	this.totalPlanesV = 6;
+	this.totalPlanesH = 20;
+	this.totalPlanesV = 4;
 	this.totalVerticesH = this.totalPlanesH*2 + 1;
 	this.totalVerticesV = this.totalPlanesV*2 + 1;
 	this.totalVertices = this.totalVerticesH * this.totalVerticesV;
@@ -71,15 +72,64 @@ SLICER.Slicer3D = function(name) {
 
 		this.scene.add( new THREE.AmbientLight( 0xFF0000 ) );
 
-		// create a point light
-		var pointLight = new THREE.PointLight(0xFFFFFF);
-		pointLight.position.set(300,300,300);
+		var hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.6 );
+		hemiLight.color.setHSL( 0.6, 1, 0.6 );
+		hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
+		hemiLight.position.set( 0, 200, 0 );
+		this.scene.add( hemiLight );
+
+		this.dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
+		// this.dirLight.color.setHSL( 0.1, 1, 0.95 );
+		this.dirLight.position.set( -1, 1.75, 1 );
+		this.dirLight.position.multiplyScalar( 50 );
+		this.scene.add( this.dirLight );
+
+		this.dirLight.castShadow = true;
+
+		this.dirLight.shadowMapWidth = 3500;
+		this.dirLight.shadowMapHeight = 3500;
+
+		var d = 400;
+
+		this.dirLight.shadowCameraLeft = -d;
+		this.dirLight.shadowCameraRight = d;
+		this.dirLight.shadowCameraTop = d;
+		this.dirLight.shadowCameraBottom = -d;
+
+		this.dirLight.shadowCameraFar = 3500;
+		this.dirLight.shadowBias = -0.0001;
+		this.dirLight.shadowDarkness = 0.35;
+		//dirLight.shadowCameraVisible = true;
+
+		var groundGeo = new THREE.PlaneGeometry( 1000, 1000 );
+		var groundMat = new THREE.MeshPhongMaterial( { ambient: 0xffffff, color: 0xffffff, specular: 0x050505 } );
+		groundMat.color.setHSL( 0.095, 1, 0.75 );
+
+		var ground = new THREE.Mesh( groundGeo, groundMat );
+		ground.rotation.x = -Math.PI/2;
+		ground.position.y = -200;
+		this.scene.add( ground );
+
+		ground.receiveShadow = true;
+
+
+		this.pointLightA = new THREE.PointLight(0xFFFFFF);
+		this.pointLightA.position.set(300,300,300);
+		// this.scene.add(this.pointLightA);
+
+
+		pointLight = new THREE.PointLight(0xFFFFFF);
+		pointLight.position.set(0,0,0);
+		// this.scene.add(pointLight);
+/*
+		pointLight = new THREE.PointLight(0xFFFFFF);
+		pointLight.position.set(300,-300,-300);
 		this.scene.add(pointLight);
 
 		pointLight = new THREE.PointLight(0xFFFFFF);
-		pointLight.position.set(-300,300,-300);
+		pointLight.position.set(-300,-300,300);
 		this.scene.add(pointLight);
-
+*/
 
 		this.renderer = new THREE.WebGLRenderer({
 			antialias: true
@@ -87,6 +137,14 @@ SLICER.Slicer3D = function(name) {
 
 		this.renderer.setClearColor(0xEEEEEE, 1);
 		this.renderer.setSize(this.stageWidth, this.stageHeight);
+
+		this.renderer.gammaInput = true;
+		this.renderer.gammaOutput = true;
+		this.renderer.physicallyBasedShading = true;
+
+		this.renderer.shadowMapEnabled = true;
+		this.renderer.shadowMapCullFace = THREE.CullFaceBack;
+
 
 		this.container = document.getElementById('container3D');
 		this.container.appendChild(this.renderer.domElement);
@@ -171,11 +229,12 @@ SLICER.Slicer3D = function(name) {
 		// material = new THREE.MeshNormalMaterial( { color: 0x996633, shading:THREE.SmoothShading, wireframe:false} );
 		// material = new THREE.MeshNormalMaterial( { color: 0x6699FF, wireframe:false, transparent:true, opacity:0.75, shading: THREE.FlatShading } )
 		material = new THREE.MeshLambertMaterial( { 
-			ambient: 0x030303, 
+			ambient: 0x000000, 
 			color: 0x6699FF, 
-			specular: 0x009900, 
+			specular: 0x336699, 
 			shininess: 30, 
-			shading: THREE.FlatShading 
+			// transparent:true, opacity:0.5,
+			shading: THREE.SmoothShading 
 		} );
 
 		// material = new THREE.MeshLambertMaterial( { color: 0x6699FF, wireframe:false, transparent:true, opacity:1.00, shading: THREE.FlatShading } );
@@ -184,6 +243,8 @@ SLICER.Slicer3D = function(name) {
 		for(i = 0; i < this.totalPlanesV; i++) {
 			geometry = this.getCustomGeometry(this.totalPlanesH, i, i*30, 30);
 			customPlane = new THREE.Mesh( geometry, material );
+			customPlane.castShadow = true;
+			customPlane.receiveShadow = true;
 			this.base.add(customPlane);
 			this.customPlanes.push(customPlane);
 		}
@@ -194,7 +255,7 @@ SLICER.Slicer3D = function(name) {
 		for(i = 0; i < this.totalPlanesV; i++) {
 			geometry = this.getCustomGeometry(this.totalPlanesH, i, i*30, 30);
 			customPlane = new THREE.Mesh( geometry, material );
-			this.base.add(customPlane);
+			// this.base.add(customPlane);
 			this.customWirePlanes.push(customPlane);
 		}
 
@@ -236,6 +297,7 @@ SLICER.Slicer3D = function(name) {
 		if(orderId%2===0){
 			for(j = 0; j < totalPlanesH; j++) {
 				id = j*6;
+
 				geometry.faces.push( new THREE.Face3( id+3, id+6, id+7 ) );
 				geometry.faces.push( new THREE.Face3( id+3, id+7, id+4 ) );
 				geometry.faces.push( new THREE.Face3( id+3, id+4, id+1 ) );
@@ -280,16 +342,20 @@ SLICER.Slicer3D = function(name) {
 			material;
 
 		this.base.rotation.y += SLICER.Params.orbitSpeed;
-		var multiplier = 10;
-		var explode = 200 - SLICER.Params.explode*200;
+
+		var multiplier = SLICER.Params.explodeVertical;
+		var outerRadius = SLICER.Params.radius;
+		var explode = outerRadius - SLICER.Params.explode*outerRadius;
 		var explodeVertical = SLICER.Params.explode*multiplier;
 
-		geometry = this.particles.geometry;
-		id = 0;
-		var heightCounter = -100;
+		var heightCountIncrement = (multiplier*2-SLICER.Params.explode*multiplier)
+		var heightCounter = -(this.totalVerticesV-1)*.5 * heightCountIncrement;
 		var heightExtra = 0;
 		var ifOdd = null;
 		var ifEven = null;
+
+		geometry = this.particles.geometry;
+		id = 0;
 		for(j = 0; j < this.totalVerticesV; j++) {
 			for(i = 0; i < this.totalVerticesH; i++) {
 				// percentage = i/(this.totalVerticesH-1.0)*TWO_PI * ((1-SLICER.Params.explode) * 1.0 + 0.0 );
@@ -318,15 +384,15 @@ SLICER.Slicer3D = function(name) {
 					geometry.vertices[id].y = heightCounter+heightExtra;
 					geometry.vertices[id].z = Math.cos(percentage)*explode;
 				} else {
-					geometry.vertices[id].x = Math.sin(percentage)*200;
+					geometry.vertices[id].x = Math.sin(percentage)*outerRadius;
 					geometry.vertices[id].y = heightCounter+heightExtra;
-					geometry.vertices[id].z = Math.cos(percentage)*200;
+					geometry.vertices[id].z = Math.cos(percentage)*outerRadius;
 				}
 
 				id++;
 			}
 
-			heightCounter += (multiplier*2-SLICER.Params.explode*multiplier);
+			heightCounter += heightCountIncrement;
 		}
 
 		// redraw
@@ -356,6 +422,12 @@ SLICER.Slicer3D = function(name) {
 	};
 
 	this.draw = function() {
+
+		var percentage = this.count*.1*TWO_PI
+		// this.pointLightA.position.x = Math.sin(percentage)*400;
+		// this.pointLightA.position.z = Math.cos(percentage)*400;
+		this.dirLight.position.x = Math.cos(percentage)*100;
+		this.dirLight.position.z = Math.sin(percentage)*100;
 
 		this.particles.geometry.verticesNeedUpdate = true;
 		// update shapes

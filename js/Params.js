@@ -25,9 +25,10 @@ SLICER.Params = function(name) {
 	this.createGui = function() {
 
 		SLICER.Params = {
-			orbitSpeed: 0.0005,
+			orbitSpeed: 0.0015,
 			guiWidth: 300,
 			explode: .35,
+			radius: 200,
 			explodeVertical: 10,
 			speed: 3.25,
 			delay: 0.001
@@ -46,7 +47,8 @@ SLICER.Params = function(name) {
 		};
 
 		this.gui.add(SLICER.Params, 'explode', 0, 1).step(0.0005).name('explode');
-		this.gui.add(SLICER.Params, 'explodeVertical', -30, 30).step(0.0005).name('explodeVertical');
+		this.gui.add(SLICER.Params, 'radius', 0, 1000).step(0.0005).name('radius');
+		this.gui.add(SLICER.Params, 'explodeVertical', 0, 20).step(0.0005).name('explodeVertical');
 
 		this.guiContainer = document.getElementById('guiContainer');
 		this.guiContainer.appendChild(this.gui.domElement);
