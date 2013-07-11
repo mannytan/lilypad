@@ -26,12 +26,13 @@ SLICER.Slicer3D = function(name) {
 	this.stageOffsetY = 0;
 
 	this.count = 0;
+	this.centerCount = 0;
 
 	this.pointLightA = null;
 
 	this.customPlanes = null;
 	this.customWirePlanes = null;
-
+	this.ground = null;
 
 	this.particles = null;
 	this.totalPlanesH = 12;
@@ -43,6 +44,10 @@ SLICER.Slicer3D = function(name) {
 
 	this.init = function() {
 		this.traceFunction("init");
+
+		// this.noise = new ClassicalNoise();
+		this.noise = new SimplexNoise();
+
 		return this;
 	};
 
@@ -84,7 +89,6 @@ SLICER.Slicer3D = function(name) {
 		this.scene.add( this.dirLight );
 
 		this.dirLight.castShadow = true;
-
 		this.dirLight.shadowMapWidth = 3500;
 		this.dirLight.shadowMapHeight = 3500;
 
@@ -98,37 +102,7 @@ SLICER.Slicer3D = function(name) {
 		this.dirLight.shadowCameraFar = 3500;
 		this.dirLight.shadowBias = -0.0001;
 		this.dirLight.shadowDarkness = 0.35;
-		//dirLight.shadowCameraVisible = true;
-
-		var groundGeo = new THREE.PlaneGeometry( 1000, 1000 );
-		var groundMat = new THREE.MeshPhongMaterial( { ambient: 0xffffff, color: 0xffffff, specular: 0x050505 } );
-		groundMat.color.setHSL( 0.000, .55, 1.0 );
-
-		var ground = new THREE.Mesh( groundGeo, groundMat );
-		ground.rotation.x = -Math.PI/2;
-		ground.position.y = -100;
-		this.scene.add( ground );
-
-		ground.receiveShadow = true;
-
-/*
-		this.pointLightA = new THREE.PointLight(0xFFFFFF);
-		this.pointLightA.position.set(300,300,300);
-		this.scene.add(this.pointLightA);
-
-
-		pointLight = new THREE.PointLight(0xFFFFFF);
-		pointLight.position.set(0,0,0);
-		this.scene.add(pointLight);
-
-		pointLight = new THREE.PointLight(0xFFFFFF);
-		pointLight.position.set(300,-300,-300);
-		this.scene.add(pointLight);
-
-		pointLight = new THREE.PointLight(0xFFFFFF);
-		pointLight.position.set(-300,-300,300);
-		this.scene.add(pointLight);
-*/
+		// this.dirLight.shadowCameraVisible = true;
 
 		this.renderer = new THREE.WebGLRenderer({
 			antialias: true
@@ -221,21 +195,15 @@ SLICER.Slicer3D = function(name) {
 		// this.base.add(this.particles);
 
 
-		// material = new THREE.ParticleBasicMaterial( { color: 0x6699FF, size: 10, wireframe:true} );
-		// material = new THREE.MeshBasicMaterial( { color: 0x6699FF, wireframe:true} );
-		// material = new THREE.MeshDepthMaterial( );
-		// material = new THREE.MeshNormalMaterial( { color: 0x996633, shading:THREE.SmoothShading, wireframe:false} );
-		// material = new THREE.MeshNormalMaterial( { color: 0x6699FF, wireframe:false, transparent:true, opacity:0.75, shading: THREE.FlatShading } )
+
+		// main plane
 		material = new THREE.MeshLambertMaterial( { 
 			ambient: 0x000000, 
 			color: 0x6699FF, 
 			specular: 0x336699, 
 			shininess: 30, 
-			// transparent:true, opacity:0.5,
-			shading: THREE.SmoothShading 
-		} );
-
-		// material = new THREE.MeshLambertMaterial( { color: 0x6699FF, wireframe:false, transparent:true, opacity:1.00, shading: THREE.FlatShading } );
+			shading: THREE.SmoothShading
+		});
 		material.side = THREE.DoubleSide;
 		this.customPlanes = [];
 		for(i = 0; i < this.totalPlanesV; i++) {
@@ -247,6 +215,9 @@ SLICER.Slicer3D = function(name) {
 			this.customPlanes.push(customPlane);
 		}
 
+
+
+		// wireframe plane
 		material = new THREE.MeshBasicMaterial( { color: 0xFFFFFF, wireframe:true, transparent:true, opacity:0.05, shading: THREE.FlatShading } )
 		material.side = THREE.DoubleSide;
 		this.customWirePlanes = [];
@@ -258,6 +229,15 @@ SLICER.Slicer3D = function(name) {
 		}
 
 
+		material = new THREE.MeshPhongMaterial( { ambient: 0xffffff, color: 0xffffff, specular: 0x050505 } );
+		geometry = new THREE.PlaneGeometry( 1000, 1000 );
+		material.color.setHSL( 0.000, .55, 1.0 );
+
+		this.ground = new THREE.Mesh( geometry, material );
+		this.ground.rotation.x = -Math.PI/2;
+		this.ground.position.y = -100;
+		this.scene.add( this.ground );
+		this.ground.receiveShadow = true;
 	};
 
 
@@ -325,7 +305,6 @@ SLICER.Slicer3D = function(name) {
 		return geometry;
 	};
 
-
 	this.createListeners = function() {
 		// this.container.addEventListener('mousedown', function(event) {
 		// 	scope.mouseDown(event);
@@ -341,73 +320,85 @@ SLICER.Slicer3D = function(name) {
 
 		this.base.rotation.y += SLICER.Params.orbitSpeed;
 
-		var multiplier = SLICER.Params.explodeVertical;
-
+		var centerSpeed = SLICER.Params.centerSpeed*.1;
+		var noiseSpeed = SLICER.Params.noiseSpeed;
+		var noiseAmount = SLICER.Params.noiseAmount;
+		var noiseIntensity = SLICER.Params.noiseIntensity;
+		var multiplier = SLICER.Params.maxHeight;
 		var centerRadius = SLICER.Params.centerRadius;
-
 		var outerRadius = SLICER.Params.radius;
 		var radiusRange = SLICER.Params.radiusRange;
-		
-		var fold = SLICER.Params.fold;
+		var wrapAmount = SLICER.Params.wrapAmount;
+		var spikes = 0;
+		var maxHeight = 0;
 
-		var explode = outerRadius - fold*outerRadius;
-		var explodeVertical = SLICER.Params.fold*multiplier;
-		var heightCountIncrement = (multiplier*2-SLICER.Params.fold*multiplier)
-		var heightCounter = -100; //-(this.totalVerticesV-1)*.5 * heightCountIncrement;
+		var heightCountIncrement = (multiplier*2-multiplier)
+
+		var heightCounter = -(this.totalVerticesV-1)*.5 * heightCountIncrement;
+
 		var heightExtra = 0;
-		var ifOdd = null;
-		var ifEven = null;
+		var isOdd = null;
+		var isEven = null;
 
 		var centerX, centerY, centerZ;
 		geometry = this.particles.geometry;
 		id = 0;
 
-		var wrappOffset = 0;
-		var wrappMultiplier = (1-fold);
+		var wrappOffset = wrapAmount*TWO_PI*.5;
+		var wrappMultiplier = (1-wrapAmount);
+		var a, b;
+
 		if(SLICER.Params.wrap===true){
-			wrappOffset += (1-fold) * 0.5 * TWO_PI;
 			wrappMultiplier = 1;
+			wrappOffset =  0;
 		}
+
 		for(j = 0; j < this.totalVerticesV; j++) {
-
-			outerRadius = SLICER.Params.radius - j/(this.totalVerticesV-1)*radiusRange * SLICER.Params.radius;
-			explode = outerRadius - fold*outerRadius;
-			explodeVertical = fold*multiplier;
-			heightCountIncrement = (multiplier*2-fold*multiplier)
-
 			for(i = 0; i < this.totalVerticesH; i++) {
 
+				// fold specifically meant to account for tiling along a polar/clynidrical map
+				// http://www.sjeiti.com/creating-tileable-noise-maps/
+				percentage = ((i+this.count)/(this.totalVerticesH-1))*TWO_PI;
+				fold = this.noise.noise3d( Math.cos(percentage)*noiseAmount, Math.sin(percentage)*noiseAmount, (j/this.totalVerticesV+this.count));
+				fold *= noiseIntensity;
+				fold = clamp(-10,1,fold);
+
+				// spikes calculation
+				outerRadius = SLICER.Params.radius - j/(this.totalVerticesV-1)*radiusRange * SLICER.Params.radius;
+				spikes = outerRadius - fold*outerRadius;
+				maxHeight = fold*multiplier;
+				heightCountIncrement = (multiplier*2-multiplier)
+
+				isOdd = i%2==1;
+				isEven = i%2==0;
+
+				heightExtra = 0;
+				if(isEven && j%4==0){
+					heightExtra += maxHeight;
+				} else if(isEven && j%4==2){
+					heightExtra -= maxHeight;
+				} else if(isOdd && j%4==2){
+					heightExtra += maxHeight;
+				} else if(isOdd && j%4==0){
+					heightExtra -= maxHeight;
+				}
+
 				// center radius motion
-				percentage = (j/this.totalVerticesV+this.count)*TWO_PI;
+				percentage = (j/this.totalVerticesV+this.centerCount)*TWO_PI;
 				centerX = Math.cos(percentage)*centerRadius*j/this.totalVerticesV;
 				centerZ = Math.sin(percentage)*centerRadius*j/this.totalVerticesV;
 
-				// percentage = i/(this.totalVerticesH-1.0)*TWO_PI;
+				// percentage = i/(this.totalVerticesH-1.0) * TWO_PI * wrappMultiplier - wrappOffset;
+				percentage = i/(this.totalVerticesH-1.0) * TWO_PI * wrappMultiplier + wrappOffset;
 
-				percentage = i/(this.totalVerticesH-1.0) * TWO_PI * wrappMultiplier - wrappOffset;
-
-				ifOdd = i%2==1;
-				ifEven = i%2==0;
-
-				heightExtra = 0;
-				if(ifEven && j%4==0){
-					heightExtra += explodeVertical;
-				} else if(ifEven && j%4==2){
-					heightExtra -= explodeVertical;
-				} else if(ifOdd && j%4==2){
-					heightExtra += explodeVertical;
-				} else if(ifOdd && j%4==0){
-					heightExtra -= explodeVertical;
-				}
-				
-				if(ifEven && j%4==1 ){
-					geometry.vertices[id].x = Math.sin(percentage)*explode + centerX;
+				if(isEven && j%4==1 ){
+					geometry.vertices[id].x = Math.sin(percentage)*spikes + centerX;
 					geometry.vertices[id].y = heightCounter+heightExtra;
-					geometry.vertices[id].z = Math.cos(percentage)*explode + centerZ;
-				} else if(ifOdd && j%4==3){
-					geometry.vertices[id].x = Math.sin(percentage)*explode + centerX;
+					geometry.vertices[id].z = Math.cos(percentage)*spikes + centerZ;
+				} else if(isOdd && j%4==3){
+					geometry.vertices[id].x = Math.sin(percentage)*spikes + centerX;
 					geometry.vertices[id].y = heightCounter+heightExtra;
-					geometry.vertices[id].z = Math.cos(percentage)*explode + centerZ;
+					geometry.vertices[id].z = Math.cos(percentage)*spikes + centerZ;
 				} else {
 					geometry.vertices[id].x = Math.sin(percentage)*outerRadius + centerX;
 					geometry.vertices[id].y = heightCounter+heightExtra;
@@ -434,30 +425,33 @@ SLICER.Slicer3D = function(name) {
 					kOffset = k * (verticesPerPlane);
 					jOffset = i * this.totalVerticesH;
 					iOffset = j;
-					this.customPlanes[k].geometry.vertices[id].copy(
-						this.particles.geometry.vertices[kOffset + jOffset + iOffset]);
-					this.customWirePlanes[k].geometry.vertices[id].copy(
-						this.particles.geometry.vertices[kOffset + jOffset + iOffset]);
+					this.customPlanes[k].geometry.vertices[id].copy( this.particles.geometry.vertices[kOffset + jOffset + iOffset]);
+					this.customWirePlanes[k].geometry.vertices[id].copy( this.particles.geometry.vertices[kOffset + jOffset + iOffset]);
 					id++;
 				}
 			}
 		}
-		this.count+=0.0125;
+		this.centerCount+= centerSpeed;
+		this.count+=noiseSpeed*.1;
 
+		// changes the y position of the ground relative to shape
+		this.ground.position.y = -(this.totalVerticesV-1)*.5 * heightCountIncrement;
 	};
 
 	this.draw = function() {
 
-		var percentage = this.count*.1*TWO_PI
+		// updates light postion
+		var percentage = this.count*.01*TWO_PI;
 		this.dirLight.position.x = Math.cos(percentage)*100;
 		this.dirLight.position.z = Math.sin(percentage)*100;
 
+		// update particles
 		this.particles.geometry.verticesNeedUpdate = true;
+		
 		// update shapes
 		for(i = 0; i < this.customPlanes.length; i++) {
 			this.customPlanes[i].geometry.verticesNeedUpdate = true;
 			this.customWirePlanes[i].geometry.verticesNeedUpdate = true;
-
 		}
 		
 		
