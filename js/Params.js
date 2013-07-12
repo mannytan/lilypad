@@ -32,12 +32,12 @@ SLICER.Params = function(name) {
 			centerRadius: 10,
 			centerSpeed: 0.1,
 			maxHeight: 10,
+			heightOffset: 10,
 			noiseSpeed: .05,
 			noiseAmount: .3,
 			noiseIntensity:1,
 			speed: 3.25,
-			wrapAmount: .35,
-			wrap:true,
+			wrapAmount: 0.0001,
 			delay: 0.001
 
 		};
@@ -64,9 +64,10 @@ SLICER.Params = function(name) {
 		this.gui.add(SLICER.Params, 'centerRadius', 0, 50).step(0.0005).name('centerRadius');
 		this.gui.add(SLICER.Params, 'centerSpeed', -1, 1).step(0.0005).name('centerSpeed');
 		this.gui.add(SLICER.Params, 'maxHeight', 0.1, 15).step(0.0005).name('maxHeight');
+		this.gui.add(SLICER.Params, 'heightOffset', -30, 30).step(0.0005).name('heightOffset');
 
-		this.gui.add(SLICER.Params, 'wrap').name('wrap');
-		this.gui.add(SLICER.Params, 'wrapAmount', -1, 1).step(0.0005).name('wrapAmount');
+		this.gui.add(SLICER.Params, 'wrapAmount', 0, 1).step(0.0005).name('wrapAmount');
+		this.gui.add(SLICER.Params, 'orbitSpeed', -.1, .1).step(0.0005).name('orbitSpeed');
 
 		this.guiContainer = document.getElementById('guiContainer');
 		this.guiContainer.appendChild(this.gui.domElement);

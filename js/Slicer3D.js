@@ -35,7 +35,7 @@ SLICER.Slicer3D = function(name) {
 	this.ground = null;
 
 	this.particles = null;
-	this.totalPlanesH = 12;
+	this.totalPlanesH = 24;
 	this.totalPlanesV = 12;
 	this.totalVerticesH = this.totalPlanesH*2 + 1;
 	this.totalVerticesV = this.totalPlanesV*2 + 1;
@@ -45,8 +45,8 @@ SLICER.Slicer3D = function(name) {
 	this.init = function() {
 		this.traceFunction("init");
 
-		// this.noise = new ClassicalNoise();
-		this.noise = new SimplexNoise();
+		// this.perlin = new ClassicalNoise();
+		this.perlin = new SimplexNoise();
 
 		return this;
 	};
@@ -236,7 +236,7 @@ SLICER.Slicer3D = function(name) {
 		this.ground = new THREE.Mesh( geometry, material );
 		this.ground.rotation.x = -Math.PI/2;
 		this.ground.position.y = -100;
-		this.scene.add( this.ground );
+		this.base.add( this.ground );
 		this.ground.receiveShadow = true;
 	};
 
@@ -334,6 +334,8 @@ SLICER.Slicer3D = function(name) {
 
 		var heightCountIncrement = (multiplier*2-multiplier)
 
+		var heightOffset = SLICER.Params.heightOffset;
+		
 		var heightCounter = -(this.totalVerticesV-1)*.5 * heightCountIncrement;
 
 		var heightExtra = 0;
@@ -348,29 +350,29 @@ SLICER.Slicer3D = function(name) {
 		var wrappMultiplier = (1-wrapAmount);
 		var a, b;
 
-		if(SLICER.Params.wrap===true){
-			wrappMultiplier = 1;
-			wrappOffset =  0;
-		}
-
 		for(j = 0; j < this.totalVerticesV; j++) {
 			for(i = 0; i < this.totalVerticesH; i++) {
 
 				// fold specifically meant to account for tiling along a polar/clynidrical map
 				// http://www.sjeiti.com/creating-tileable-noise-maps/
 				percentage = ((i+this.count)/(this.totalVerticesH-1))*TWO_PI;
-				fold = this.noise.noise3d( Math.cos(percentage)*noiseAmount, Math.sin(percentage)*noiseAmount, (j/this.totalVerticesV+this.count));
+				fold = this.perlin.noise3d( Math.cos(percentage)*noiseAmount, Math.sin(percentage)*noiseAmount, (j/this.totalVerticesV+this.count));
 				fold *= noiseIntensity;
-				fold = clamp(-10,1,fold);
+				// fold = clamp(-10,1,fold);
 
 				// spikes calculation
 				outerRadius = SLICER.Params.radius - j/(this.totalVerticesV-1)*radiusRange * SLICER.Params.radius;
 				spikes = outerRadius - fold*outerRadius;
-				maxHeight = fold*multiplier;
+				maxHeight = fold*multiplier*10;
 				heightCountIncrement = (multiplier*2-multiplier)
 
 				isOdd = i%2==1;
 				isEven = i%2==0;
+
+				// center radius motion
+				percentage = (j/this.totalVerticesV+this.centerCount)*TWO_PI;
+				centerX = Math.cos(percentage)*centerRadius*j/this.totalVerticesV;
+				centerZ = Math.sin(percentage)*centerRadius*j/this.totalVerticesV;
 
 				heightExtra = 0;
 				if(isEven && j%4==0){
@@ -383,25 +385,26 @@ SLICER.Slicer3D = function(name) {
 					heightExtra -= maxHeight;
 				}
 
-				// center radius motion
-				percentage = (j/this.totalVerticesV+this.centerCount)*TWO_PI;
-				centerX = Math.cos(percentage)*centerRadius*j/this.totalVerticesV;
-				centerZ = Math.sin(percentage)*centerRadius*j/this.totalVerticesV;
-
 				// percentage = i/(this.totalVerticesH-1.0) * TWO_PI * wrappMultiplier - wrappOffset;
 				percentage = i/(this.totalVerticesH-1.0) * TWO_PI * wrappMultiplier + wrappOffset;
-
-				if(isEven && j%4==1 ){
-					geometry.vertices[id].x = Math.sin(percentage)*spikes + centerX;
-					geometry.vertices[id].y = heightCounter+heightExtra;
-					geometry.vertices[id].z = Math.cos(percentage)*spikes + centerZ;
-				} else if(isOdd && j%4==3){
+/*
+				if(isEven && j%4==1 || isOdd && j%4==3){
 					geometry.vertices[id].x = Math.sin(percentage)*spikes + centerX;
 					geometry.vertices[id].y = heightCounter+heightExtra;
 					geometry.vertices[id].z = Math.cos(percentage)*spikes + centerZ;
 				} else {
 					geometry.vertices[id].x = Math.sin(percentage)*outerRadius + centerX;
 					geometry.vertices[id].y = heightCounter+heightExtra;
+					geometry.vertices[id].z = Math.cos(percentage)*outerRadius + centerZ;
+				}
+*/
+				if(isEven && j%4==1 || isOdd && j%4==3){
+					geometry.vertices[id].x = Math.sin(percentage)*outerRadius + centerX;
+					geometry.vertices[id].y = maxHeight; //heightCounter+heightExtra;
+					geometry.vertices[id].z = Math.cos(percentage)*outerRadius + centerZ;
+				} else {
+					geometry.vertices[id].x = Math.sin(percentage)*outerRadius + centerX;
+					geometry.vertices[id].y = maxHeight + heightOffset;
 					geometry.vertices[id].z = Math.cos(percentage)*outerRadius + centerZ;
 				}
 
@@ -411,13 +414,12 @@ SLICER.Slicer3D = function(name) {
 			heightCounter += heightCountIncrement;
 		}
 
-		// redraw
+		// assigns vertices from particles to planes
 		// order is refactored to traverse from x -> y to y -> x
 		var vertice;
 		var particle;
 		var kOffset, jOffset, iOffset;
 		var verticesPerPlane = this.totalPlanesH*4+2;
-
 		for(k = 0; k < this.totalPlanesV; k++) {
 			id = 0;
 			for(j = 0; j < this.totalVerticesH; j++) {
@@ -431,6 +433,7 @@ SLICER.Slicer3D = function(name) {
 				}
 			}
 		}
+
 		this.centerCount+= centerSpeed;
 		this.count+=noiseSpeed*.1;
 
@@ -456,7 +459,7 @@ SLICER.Slicer3D = function(name) {
 		
 		
 		this.controls.update();
-		this.renderer.render(this.scene, this.camera);
+		this.renderer.render( this.scene , this.camera );
 	};
 
 	this.enableTrackBall = function() {
