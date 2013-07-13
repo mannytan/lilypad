@@ -27,12 +27,13 @@ SLICER.Params = function(name) {
 		SLICER.Params = {
 			orbitSpeed: 0.0015,
 			guiWidth: 250,
-			radius: 100,
+			radius: 200,
 			radiusRange: .75,
 			centerRadius: 10,
 			centerSpeed: 0.1,
 			maxHeight: 10,
 			heightOffset: 10,
+			maxHeightRange: 1,
 			noiseSpeed: .05,
 			noiseAmount: .3,
 			noiseIntensity:1,
@@ -64,6 +65,8 @@ SLICER.Params = function(name) {
 		this.gui.add(SLICER.Params, 'centerRadius', 0, 50).step(0.0005).name('centerRadius');
 		this.gui.add(SLICER.Params, 'centerSpeed', -1, 1).step(0.0005).name('centerSpeed');
 		this.gui.add(SLICER.Params, 'maxHeight', 0.1, 15).step(0.0005).name('maxHeight');
+		this.gui.add(SLICER.Params, 'maxHeightRange', -1, 1).step(0.0005).name('maxHeightRange');
+		
 		this.gui.add(SLICER.Params, 'heightOffset', -30, 30).step(0.0005).name('heightOffset');
 
 		this.gui.add(SLICER.Params, 'wrapAmount', 0, 1).step(0.0005).name('wrapAmount');

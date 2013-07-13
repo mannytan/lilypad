@@ -335,6 +335,7 @@ SLICER.Slicer3D = function(name) {
 		var heightCountIncrement = (multiplier*2-multiplier)
 
 		var heightOffset = SLICER.Params.heightOffset;
+		var maxHeightRange = SLICER.Params.maxHeightRange;
 		
 		var heightCounter = -(this.totalVerticesV-1)*.5 * heightCountIncrement;
 
@@ -404,7 +405,7 @@ SLICER.Slicer3D = function(name) {
 					geometry.vertices[id].z = Math.cos(percentage)*outerRadius + centerZ;
 				} else {
 					geometry.vertices[id].x = Math.sin(percentage)*outerRadius + centerX;
-					geometry.vertices[id].y = maxHeight + heightOffset;
+					geometry.vertices[id].y = maxHeight*maxHeightRange + heightOffset;
 					geometry.vertices[id].z = Math.cos(percentage)*outerRadius + centerZ;
 				}
 
