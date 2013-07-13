@@ -35,8 +35,11 @@ SLICER.Slicer3D = function(name) {
 	this.ground = null;
 
 	this.particles = null;
-	this.totalPlanesH = 24;
-	this.totalPlanesV = 12;
+
+
+
+	this.totalPlanesH = getUrlVars()["totalWidth"] ? getUrlVars()["totalWidth"] : 48;
+	this.totalPlanesV = getUrlVars()["totalDepth"] ? getUrlVars()["totalDepth"] : 24;
 	this.totalVerticesH = this.totalPlanesH*2 + 1;
 	this.totalVerticesV = this.totalPlanesV*2 + 1;
 	this.totalVertices = this.totalVerticesH * this.totalVerticesV;
@@ -85,14 +88,14 @@ SLICER.Slicer3D = function(name) {
 		this.dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
 		// this.dirLight.color.setHSL( 0.1, 1, 0.95 );
 		this.dirLight.position.set( -1, 1.75, 1 );
-		this.dirLight.position.multiplyScalar( 50 );
+		this.dirLight.position.multiplyScalar( 100 );
 		this.scene.add( this.dirLight );
 
 		this.dirLight.castShadow = true;
 		this.dirLight.shadowMapWidth = 3500;
 		this.dirLight.shadowMapHeight = 3500;
 
-		var d = 400;
+		var d = 600;
 
 		this.dirLight.shadowCameraLeft = -d;
 		this.dirLight.shadowCameraRight = d;
@@ -363,6 +366,7 @@ SLICER.Slicer3D = function(name) {
 
 				// spikes calculation
 				outerRadius = SLICER.Params.radius - j/(this.totalVerticesV-1)*radiusRange * SLICER.Params.radius;
+				outerRadius = SLICER.Params.radius - j/(this.totalVerticesV-1)*radiusRange * SLICER.Params.radius;
 				spikes = outerRadius - fold*outerRadius;
 				maxHeight = fold*multiplier*10;
 				heightCountIncrement = (multiplier*2-multiplier)
@@ -388,6 +392,17 @@ SLICER.Slicer3D = function(name) {
 
 				// percentage = i/(this.totalVerticesH-1.0) * TWO_PI * wrappMultiplier - wrappOffset;
 				percentage = i/(this.totalVerticesH-1.0) * TWO_PI * wrappMultiplier + wrappOffset;
+
+				if(isEven && j%4==1 || isOdd && j%4==3){
+					geometry.vertices[id].x = Math.sin(percentage)*outerRadius + centerX;
+					geometry.vertices[id].y = maxHeight; //heightCounter+heightExtra;
+					geometry.vertices[id].z = Math.cos(percentage)*outerRadius + centerZ;
+				} else {
+					geometry.vertices[id].x = Math.sin(percentage)*outerRadius + centerX;
+					geometry.vertices[id].y = maxHeight*maxHeightRange + heightOffset;
+					geometry.vertices[id].z = Math.cos(percentage)*outerRadius + centerZ;
+				}
+
 /*
 				if(isEven && j%4==1 || isOdd && j%4==3){
 					geometry.vertices[id].x = Math.sin(percentage)*spikes + centerX;
@@ -399,15 +414,6 @@ SLICER.Slicer3D = function(name) {
 					geometry.vertices[id].z = Math.cos(percentage)*outerRadius + centerZ;
 				}
 */
-				if(isEven && j%4==1 || isOdd && j%4==3){
-					geometry.vertices[id].x = Math.sin(percentage)*outerRadius + centerX;
-					geometry.vertices[id].y = maxHeight; //heightCounter+heightExtra;
-					geometry.vertices[id].z = Math.cos(percentage)*outerRadius + centerZ;
-				} else {
-					geometry.vertices[id].x = Math.sin(percentage)*outerRadius + centerX;
-					geometry.vertices[id].y = maxHeight*maxHeightRange + heightOffset;
-					geometry.vertices[id].z = Math.cos(percentage)*outerRadius + centerZ;
-				}
 
 				id++;
 			}

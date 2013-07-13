@@ -42,6 +42,14 @@ function shuffleArray(total){
 	return b;
 }
 
+function getUrlVars() {
+	var vars = {};
+	var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+		vars[key] = value;
+	});
+	return vars;
+}
+
 var TO_DEGREES = 180 / Math.PI;
 var TO_RADIANS = Math.PI / 180;
 var TWO_PI = Math.PI * 2;

@@ -39,7 +39,10 @@ SLICER.Params = function(name) {
 			noiseIntensity:1,
 			speed: 3.25,
 			wrapAmount: 0.0001,
-			delay: 0.001
+			delay: 0.001,
+			randomizeAllValues: function(){
+				scope.randomizeAllValues();
+			}
 
 		};
 
@@ -54,23 +57,28 @@ SLICER.Params = function(name) {
 			return false;
 		};
 
-		
-		this.gui.add(SLICER.Params, 'noiseSpeed', -1, 1).step(0.0005).name('noiseSpeed');
-		this.gui.add(SLICER.Params, 'noiseAmount', 0, 2).step(0.0005).name('noiseAmount');
-		this.gui.add(SLICER.Params, 'noiseIntensity', 0, 5).step(0.0005).name('noiseIntensity');
-		
-		this.gui.add(SLICER.Params, 'radiusRange', 0, 1).step(0.0005).name('radiusRange');
-		this.gui.add(SLICER.Params, 'radius', 0, 400).step(0.0005).name('radius');
+		SLICER.Sliders.speed = this.gui.add(SLICER.Params, 'speed', 0.1, 5.0).step(0.0005).name('speed');
+		SLICER.Sliders.delay = this.gui.add(SLICER.Params, 'delay', 0.0, 5.0).step(0.0005).name('delay');
 
-		this.gui.add(SLICER.Params, 'centerRadius', 0, 50).step(0.0005).name('centerRadius');
-		this.gui.add(SLICER.Params, 'centerSpeed', -1, 1).step(0.0005).name('centerSpeed');
-		this.gui.add(SLICER.Params, 'maxHeight', 0.1, 15).step(0.0005).name('maxHeight');
-		this.gui.add(SLICER.Params, 'maxHeightRange', -1, 1).step(0.0005).name('maxHeightRange');
+		SLICER.Sliders.noiseSpeed = this.gui.add(SLICER.Params, 'noiseSpeed', -1, 1).step(0.0005).name('noiseSpeed');
+		SLICER.Sliders.noiseAmount = this.gui.add(SLICER.Params, 'noiseAmount', 0, 2).step(0.0005).name('noiseAmount');
+		SLICER.Sliders.noiseIntensity = this.gui.add(SLICER.Params, 'noiseIntensity', 0, 5).step(0.0005).name('noiseIntensity');
 		
-		this.gui.add(SLICER.Params, 'heightOffset', -30, 30).step(0.0005).name('heightOffset');
+		SLICER.Sliders.radiusRange = this.gui.add(SLICER.Params, 'radiusRange', .5, 1).step(0.0005).name('radiusRange');
+		SLICER.Sliders.radius = this.gui.add(SLICER.Params, 'radius', 0, 400).step(0.0005).name('radius');
 
-		this.gui.add(SLICER.Params, 'wrapAmount', 0, 1).step(0.0005).name('wrapAmount');
-		this.gui.add(SLICER.Params, 'orbitSpeed', -.1, .1).step(0.0005).name('orbitSpeed');
+		SLICER.Sliders.centerRadius = this.gui.add(SLICER.Params, 'centerRadius', 0, 50).step(0.0005).name('centerRadius');
+		SLICER.Sliders.centerSpeed = this.gui.add(SLICER.Params, 'centerSpeed', -.5, .5).step(0.0005).name('centerSpeed');
+		SLICER.Sliders.maxHeight = this.gui.add(SLICER.Params, 'maxHeight', 0.1, 15).step(0.0005).name('maxHeight');
+		SLICER.Sliders.maxHeightRange = this.gui.add(SLICER.Params, 'maxHeightRange', -1, 1).step(0.0005).name('maxHeightRange');
+		
+		SLICER.Sliders.heightOffset = this.gui.add(SLICER.Params, 'heightOffset', -30, 30).step(0.0005).name('heightOffset');
+
+		SLICER.Sliders.wrapAmount = this.gui.add(SLICER.Params, 'wrapAmount', 0, 1).step(0.0005).name('wrapAmount');
+		SLICER.Sliders.orbitSpeed = this.gui.add(SLICER.Params, 'orbitSpeed', -.1, .1).step(0.0005).name('orbitSpeed');
+
+		this.gui.add(SLICER.Params, 'randomizeAllValues').name('MORPH SHAPE');
+
 
 		this.guiContainer = document.getElementById('guiContainer');
 		this.guiContainer.appendChild(this.gui.domElement);
@@ -105,6 +113,51 @@ SLICER.Params = function(name) {
 			onStop:setter,
 		}
 	}
+
+	this.randomizeAllValues = function() {
+		// trace("randomizeAllValues");
+		var tweens = [];
+		var tween;
+
+		function delayer (total){
+
+			var order = shuffleArray(total);
+			var counter = 0;
+			return function(e){
+				return order[counter++]*SLICER.Params.delay;
+			};
+		};
+
+		var getItemDelay = delayer(10);
+
+
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.noiseAmount,  param:SLICER.Params.noiseAmount}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.noiseIntensity,  param:SLICER.Params.noiseIntensity}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.radiusRange,  param:SLICER.Params.radiusRange}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.radius,  param:SLICER.Params.radius}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.centerRadius,  param:SLICER.Params.centerRadius}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.centerSpeed,  param:SLICER.Params.centerSpeed}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.maxHeight,  param:SLICER.Params.maxHeight}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.maxHeightRange,  param:SLICER.Params.maxHeightRange}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.heightOffset,  param:SLICER.Params.heightOffset}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.wrapAmount,  param:SLICER.Params.wrapAmount}));
+
+		tween = {
+			time:0,
+			duration:SLICER.Params.speed,
+			effect:'easeInOut',
+			start:0,
+			stop:1,
+			onStop:function(){
+				// scope.waiter();
+			},
+		}
+		tweens.push(tween);
+		$('#proxy').clear();
+		$('#proxy').tween(tweens).play();
+		return this;
+
+	};
 
 	this.waiter = function() {
 		// trace("waiter");
