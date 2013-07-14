@@ -61,18 +61,18 @@ SLICER.Params = function(name) {
 		SLICER.Sliders.delay = this.gui.add(SLICER.Params, 'delay', 0.0, 5.0).step(0.0005).name('delay');
 
 		SLICER.Sliders.noiseSpeed = this.gui.add(SLICER.Params, 'noiseSpeed', -1, 1).step(0.0005).name('noiseSpeed');
-		SLICER.Sliders.noiseAmount = this.gui.add(SLICER.Params, 'noiseAmount', 0, 2).step(0.0005).name('noiseAmount');
+		SLICER.Sliders.noiseAmount = this.gui.add(SLICER.Params, 'noiseAmount', 0, 5).step(0.0005).name('noiseAmount');
 		SLICER.Sliders.noiseIntensity = this.gui.add(SLICER.Params, 'noiseIntensity', 0, 5).step(0.0005).name('noiseIntensity');
 		
 		SLICER.Sliders.radiusRange = this.gui.add(SLICER.Params, 'radiusRange', .5, 1).step(0.0005).name('radiusRange');
 		SLICER.Sliders.radius = this.gui.add(SLICER.Params, 'radius', 0, 400).step(0.0005).name('radius');
 
 		SLICER.Sliders.centerRadius = this.gui.add(SLICER.Params, 'centerRadius', 0, 50).step(0.0005).name('centerRadius');
-		SLICER.Sliders.centerSpeed = this.gui.add(SLICER.Params, 'centerSpeed', -.5, .5).step(0.0005).name('centerSpeed');
-		SLICER.Sliders.maxHeight = this.gui.add(SLICER.Params, 'maxHeight', 0.1, 15).step(0.0005).name('maxHeight');
+		SLICER.Sliders.centerSpeed = this.gui.add(SLICER.Params, 'centerSpeed', -.25, .25).step(0.0005).name('centerSpeed');
+		SLICER.Sliders.maxHeight = this.gui.add(SLICER.Params, 'maxHeight', -2, 15).step(0.0005).name('maxHeight');
 		SLICER.Sliders.maxHeightRange = this.gui.add(SLICER.Params, 'maxHeightRange', -1, 1).step(0.0005).name('maxHeightRange');
 		
-		SLICER.Sliders.heightOffset = this.gui.add(SLICER.Params, 'heightOffset', -30, 30).step(0.0005).name('heightOffset');
+		SLICER.Sliders.heightOffset = this.gui.add(SLICER.Params, 'heightOffset', -100, 100).step(0.0005).name('heightOffset');
 
 		SLICER.Sliders.wrapAmount = this.gui.add(SLICER.Params, 'wrapAmount', 0, 1).step(0.0005).name('wrapAmount');
 		SLICER.Sliders.orbitSpeed = this.gui.add(SLICER.Params, 'orbitSpeed', -.1, .1).step(0.0005).name('orbitSpeed');

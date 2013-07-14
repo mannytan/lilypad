@@ -202,7 +202,7 @@ SLICER.Slicer3D = function(name) {
 		// main plane
 		material = new THREE.MeshLambertMaterial( { 
 			ambient: 0x000000, 
-			color: 0x6699FF, 
+			color: 0x37f8ff, //0x6699FF, 
 			specular: 0x336699, 
 			shininess: 30, 
 			shading: THREE.SmoothShading
@@ -227,14 +227,17 @@ SLICER.Slicer3D = function(name) {
 		for(i = 0; i < this.totalPlanesV; i++) {
 			geometry = this.getCustomGeometry(this.totalPlanesH, i, i*30, 30);
 			customPlane = new THREE.Mesh( geometry, material );
-			this.base.add(customPlane);
+			// this.base.add(customPlane);
 			this.customWirePlanes.push(customPlane);
 		}
 
 
-		material = new THREE.MeshPhongMaterial( { ambient: 0xffffff, color: 0xffffff, specular: 0x050505 } );
+		material = new THREE.MeshPhongMaterial( { 
+			ambient: 0x333333, 
+			color: 0x000000, 
+			specular: 0x050505 } );
 		geometry = new THREE.PlaneGeometry( 1000, 1000 );
-		material.color.setHSL( 0.000, .55, 1.0 );
+		// material.color.setHSL( 0.000, .55, 1.0 );
 
 		this.ground = new THREE.Mesh( geometry, material );
 		this.ground.rotation.x = -Math.PI/2;
@@ -365,7 +368,7 @@ SLICER.Slicer3D = function(name) {
 				// fold = clamp(-10,1,fold);
 
 				// spikes calculation
-				outerRadius = SLICER.Params.radius - j/(this.totalVerticesV-1)*radiusRange * SLICER.Params.radius;
+				// outerRadius = SLICER.Params.radius - j/(this.totalVerticesV-1)*radiusRange * SLICER.Params.radius;
 				outerRadius = SLICER.Params.radius - j/(this.totalVerticesV-1)*radiusRange * SLICER.Params.radius;
 				spikes = outerRadius - fold*outerRadius;
 				maxHeight = fold*multiplier*10;
@@ -376,8 +379,8 @@ SLICER.Slicer3D = function(name) {
 
 				// center radius motion
 				percentage = (j/this.totalVerticesV+this.centerCount)*TWO_PI;
-				centerX = Math.cos(percentage)*centerRadius*j/this.totalVerticesV;
-				centerZ = Math.sin(percentage)*centerRadius*j/this.totalVerticesV;
+				centerX = Math.cos(percentage)*centerRadius*(j/this.totalVerticesV*2-1);
+				centerZ = Math.sin(percentage)*centerRadius*(j/this.totalVerticesV*2-1);
 
 				heightExtra = 0;
 				if(isEven && j%4==0){
