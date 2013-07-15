@@ -42,6 +42,8 @@ SLICER.Slicer3D = function(name) {
 	this.totalVerticesV = this.totalPlanesV*2 + 1;
 	this.totalVertices = this.totalVerticesH * this.totalVerticesV;
 
+	this.maxHeightCache = null;
+	this.maxHeightCacheSize = 20;
 
 	this.init = function() {
 		this.traceFunction("init");
@@ -199,13 +201,14 @@ SLICER.Slicer3D = function(name) {
 
 
 		var colorOffset = Math.random();
+		var colorRange = Math.random()*.25+.15;
 		this.customPlanes = [];
 		for(i = 0; i < this.totalPlanesV; i++) {
 			geometry = this.getCustomGeometry(this.totalPlanesH, i, i*30, 30);
 			// main plane
 			material = new THREE.MeshLambertMaterial( { 
 				ambient: 0x000000, 
-				color: new THREE.Color().setHSL( (i/this.totalPlanesV*.25 + colorOffset)%1 , 1, .5), //0x6699FF, 
+				color: new THREE.Color().setHSL( (i/this.totalPlanesV*colorRange + colorOffset)%1 , 1, .5), //0x6699FF, 
 				specular: 0x336699, 
 				shininess: 30, 
 				shading: THREE.SmoothShading,
@@ -218,6 +221,21 @@ SLICER.Slicer3D = function(name) {
 			this.base.add(customPlane);
 			this.customPlanes.push(customPlane);
 		}
+
+		var cache = [];
+		for(i = 0; i < this.maxHeightCacheSize; i++) {
+			cache.push(0);
+		};
+		this.maxHeightCache = [];
+		var id = 0;
+		for(j = 0; j < this.totalVerticesV; j++) {
+			for(i = 0; i < this.totalVerticesH; i++) {
+				this.maxHeightCache.push(cache.slice());
+				id++;
+			}
+		}
+
+
 
 
 
@@ -330,7 +348,7 @@ SLICER.Slicer3D = function(name) {
 		var noiseSpeed = SLICER.Params.noiseSpeed;
 		var noiseAmount = SLICER.Params.noiseAmount;
 		var noiseIntensity = SLICER.Params.noiseIntensity;
-		var multiplier = SLICER.Params.maxHeight;
+		var multiplier = SLICER.Params.multiplier;
 		var centerRadius = SLICER.Params.centerRadius;
 		var centerOffset = SLICER.Params.centerOffset;
 
@@ -344,7 +362,6 @@ SLICER.Slicer3D = function(name) {
 
 		var heightOffset = SLICER.Params.heightOffset;
 		var maxHeightRange = SLICER.Params.maxHeightRange;
-		
 		var heightCounter = -(this.totalVerticesV-1)*.5 * heightCountIncrement;
 
 		var heightExtra = 0;
@@ -396,15 +413,24 @@ SLICER.Slicer3D = function(name) {
 				// percentage = i/(this.totalVerticesH-1.0) * TWO_PI * wrappMultiplier - wrappOffset;
 				percentage = i/(this.totalVerticesH-1.0) * TWO_PI * wrappMultiplier + wrappOffset;
 
+				// this.maxHeightCache[id].push(maxHeight*maxHeightRange + heightOffset);
+				// this.maxHeightCache[id].shift();
+
 				if(isEven && j%4==1 || isOdd && j%4==3){
 					geometry.vertices[id].x = Math.sin(percentage)*outerRadius + centerX;
-					geometry.vertices[id].y = maxHeight; //heightCounter+heightExtra;
+					// geometry.vertices[id].y = maxHeight; //heightCounter+heightExtra;
+					geometry.vertices[id].y = maxHeight + this.maxHeightCache[id][0]; //heightCounter+heightExtra;
 					geometry.vertices[id].z = Math.cos(percentage)*outerRadius + centerZ;
 				} else {
 					geometry.vertices[id].x = Math.sin(percentage)*outerRadius + centerX;
-					geometry.vertices[id].y = maxHeight*maxHeightRange + heightOffset;
+					// geometry.vertices[id].y = this.maxHeightCache[id][this.maxHeightCacheSize-1]; //heightCounter+heightExtra;
+					geometry.vertices[id].y = maxHeight*maxHeightRange + heightOffset; //heightCounter+heightExtra;
 					geometry.vertices[id].z = Math.cos(percentage)*outerRadius + centerZ;
 				}
+
+				// this.maxHeightCache[id].push(maxHeight*maxHeightRange + heightOffset);
+				// this.maxHeightCache[id].shift();
+				// geometry.vertices[id].y = this.maxHeightCache[id][0];
 
 				id++;
 			}

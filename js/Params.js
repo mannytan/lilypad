@@ -33,6 +33,7 @@ SLICER.Params = function(name) {
 			centerSpeed: 0.1,
 			centerOffset: 0.001,
 			maxHeight: 10,
+			multiplier: 10,
 			heightOffset: 10,
 			maxHeightRange: 1,
 			noiseSpeed: .05,
@@ -63,15 +64,16 @@ SLICER.Params = function(name) {
 
 		SLICER.Sliders.noiseSpeed = this.gui.add(SLICER.Params, 'noiseSpeed', -1, 1).step(0.0005).name('noiseSpeed');
 		SLICER.Sliders.noiseAmount = this.gui.add(SLICER.Params, 'noiseAmount', 0, 5).step(0.0005).name('noiseAmount');
-		SLICER.Sliders.noiseIntensity = this.gui.add(SLICER.Params, 'noiseIntensity', 0, 5).step(0.0005).name('noiseIntensity');
+		SLICER.Sliders.noiseIntensity = this.gui.add(SLICER.Params, 'noiseIntensity', .25, 2).step(0.0005).name('noiseIntensity');
 		
 		SLICER.Sliders.radiusRange = this.gui.add(SLICER.Params, 'radiusRange', .5, 1).step(0.0005).name('radiusRange');
-		SLICER.Sliders.radius = this.gui.add(SLICER.Params, 'radius', 0, 400).step(0.0005).name('radius');
+		SLICER.Sliders.radius = this.gui.add(SLICER.Params, 'radius', 100, 400).step(0.0005).name('radius');
 
 		SLICER.Sliders.centerRadius = this.gui.add(SLICER.Params, 'centerRadius', 0, 25).step(0.0005).name('centerRadius');
 		SLICER.Sliders.centerSpeed = this.gui.add(SLICER.Params, 'centerSpeed', -.125, .125).step(0.0005).name('centerSpeed');
 		SLICER.Sliders.centerOffset = this.gui.add(SLICER.Params, 'centerOffset', -2, 2).step(0.0005).name('centerOffset');
-		
+
+		SLICER.Sliders.multiplier = this.gui.add(SLICER.Params, 'multiplier', -15, 15).step(0.0005).name('multiplier');
 		SLICER.Sliders.maxHeight = this.gui.add(SLICER.Params, 'maxHeight', -2, 15).step(0.0005).name('maxHeight');
 		SLICER.Sliders.maxHeightRange = this.gui.add(SLICER.Params, 'maxHeightRange', -1, 1).step(0.0005).name('maxHeightRange');
 		
@@ -131,7 +133,7 @@ SLICER.Params = function(name) {
 			};
 		};
 
-		var getItemDelay = delayer(10);
+		var getItemDelay = delayer(11);
 
 
 		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.noiseAmount,  param:SLICER.Params.noiseAmount}));
@@ -141,10 +143,11 @@ SLICER.Params = function(name) {
 		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.centerRadius,  param:SLICER.Params.centerRadius}));
 		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.centerSpeed,  param:SLICER.Params.centerSpeed}));
 		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.centerOffset,  param:SLICER.Params.centerOffset}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.multiplier,  param:SLICER.Params.multiplier}));
 		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.maxHeight,  param:SLICER.Params.maxHeight}));
 		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.maxHeightRange,  param:SLICER.Params.maxHeightRange}));
 		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.heightOffset,  param:SLICER.Params.heightOffset}));
-		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.wrapAmount,  param:SLICER.Params.wrapAmount}));
+		// tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.wrapAmount,  param:SLICER.Params.wrapAmount}));
 
 		tween = {
 			time:0,
