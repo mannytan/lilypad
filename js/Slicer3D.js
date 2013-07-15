@@ -95,7 +95,7 @@ SLICER.Slicer3D = function(name) {
 		this.dirLight.shadowMapWidth = 3500;
 		this.dirLight.shadowMapHeight = 3500;
 
-		var d = 600;
+		var d = 800;
 
 		this.dirLight.shadowCameraLeft = -d;
 		this.dirLight.shadowCameraRight = d;
@@ -236,9 +236,6 @@ SLICER.Slicer3D = function(name) {
 		}
 
 
-
-
-
 		// wireframe plane
 		material = new THREE.MeshBasicMaterial( { color: 0xFFFFFF, wireframe:true, transparent:true, opacity:0.05, shading: THREE.FlatShading } )
 		material.side = THREE.DoubleSide;
@@ -252,7 +249,11 @@ SLICER.Slicer3D = function(name) {
 
 		material = new THREE.MeshPhongMaterial( { 
 			ambient: 0x333333, 
-			color: 0x000000, 
+			// color: 0x3336699, 
+			color: new THREE.Color().setHSL( (1*colorRange + colorOffset)%1 , 1, .35), //0x6699FF, 
+			side:THREE.DoubleSide,
+			transparent: true,
+			opacity: .9,
 			specular: 0x050505 } );
 		geometry = new THREE.PlaneGeometry( 1000, 1000 );
 		// material.color.setHSL( 0.000, .55, 1.0 );
@@ -352,6 +353,7 @@ SLICER.Slicer3D = function(name) {
 		var centerRadius = SLICER.Params.centerRadius;
 		var centerOffset = SLICER.Params.centerOffset;
 
+		var groundHeight = SLICER.Params.groundHeight;
 		var outerRadius = SLICER.Params.radius;
 		var radiusRange = SLICER.Params.radiusRange;
 		var wrapAmount = SLICER.Params.wrapAmount;
@@ -462,7 +464,7 @@ SLICER.Slicer3D = function(name) {
 		this.count+=noiseSpeed*.1;
 
 		// changes the y position of the ground relative to shape
-		// this.ground.position.y = -(this.totalVerticesV-1)*.5 * heightCountIncrement;
+		this.ground.position.y = groundHeight;
 	};
 
 	this.draw = function() {
