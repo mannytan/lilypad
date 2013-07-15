@@ -31,6 +31,7 @@ SLICER.Params = function(name) {
 			radiusRange: .75,
 			centerRadius: 10,
 			centerSpeed: 0.1,
+			centerOffset: 0.001,
 			maxHeight: 10,
 			heightOffset: 10,
 			maxHeightRange: 1,
@@ -38,7 +39,7 @@ SLICER.Params = function(name) {
 			noiseAmount: .3,
 			noiseIntensity:1,
 			speed: 3.25,
-			wrapAmount: 0.0001,
+			wrapAmount: 0.99999,
 			delay: 0.001,
 			randomizeAllValues: function(){
 				scope.randomizeAllValues();
@@ -67,8 +68,10 @@ SLICER.Params = function(name) {
 		SLICER.Sliders.radiusRange = this.gui.add(SLICER.Params, 'radiusRange', .5, 1).step(0.0005).name('radiusRange');
 		SLICER.Sliders.radius = this.gui.add(SLICER.Params, 'radius', 0, 400).step(0.0005).name('radius');
 
-		SLICER.Sliders.centerRadius = this.gui.add(SLICER.Params, 'centerRadius', 0, 50).step(0.0005).name('centerRadius');
-		SLICER.Sliders.centerSpeed = this.gui.add(SLICER.Params, 'centerSpeed', -.25, .25).step(0.0005).name('centerSpeed');
+		SLICER.Sliders.centerRadius = this.gui.add(SLICER.Params, 'centerRadius', 0, 25).step(0.0005).name('centerRadius');
+		SLICER.Sliders.centerSpeed = this.gui.add(SLICER.Params, 'centerSpeed', -.125, .125).step(0.0005).name('centerSpeed');
+		SLICER.Sliders.centerOffset = this.gui.add(SLICER.Params, 'centerOffset', -2, 2).step(0.0005).name('centerOffset');
+		
 		SLICER.Sliders.maxHeight = this.gui.add(SLICER.Params, 'maxHeight', -2, 15).step(0.0005).name('maxHeight');
 		SLICER.Sliders.maxHeightRange = this.gui.add(SLICER.Params, 'maxHeightRange', -1, 1).step(0.0005).name('maxHeightRange');
 		
@@ -137,6 +140,7 @@ SLICER.Params = function(name) {
 		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.radius,  param:SLICER.Params.radius}));
 		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.centerRadius,  param:SLICER.Params.centerRadius}));
 		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.centerSpeed,  param:SLICER.Params.centerSpeed}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.centerOffset,  param:SLICER.Params.centerOffset}));
 		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.maxHeight,  param:SLICER.Params.maxHeight}));
 		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.maxHeightRange,  param:SLICER.Params.maxHeightRange}));
 		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.heightOffset,  param:SLICER.Params.heightOffset}));
