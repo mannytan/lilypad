@@ -15,7 +15,7 @@ SLICER.Params = function(name) {
 	UNCTRL.BoilerPlate.call(this);
 
 	this.name = 'Params';
-	this.slicer3D = null;
+	this.scope3d = null;
 
 	this.init = function() {
 		this.traceFunction("init");
@@ -40,10 +40,15 @@ SLICER.Params = function(name) {
 			noiseAmount: .3,
 			noiseIntensity:1,
 			speed: 3.25,
+			colorOffset:.35,
+			colorRange:.5,
 			wrapAmount: 0.99999,
 			delay: 0.001,
 			randomizeAllValues: function(){
 				scope.randomizeAllValues();
+			},
+			randomizeColor: function(){
+				scope.randomizeColor();
 			}
 
 		};
@@ -82,8 +87,11 @@ SLICER.Params = function(name) {
 		SLICER.Sliders.wrapAmount = this.gui.add(SLICER.Params, 'wrapAmount', 0, 1).step(0.0005).name('wrapAmount');
 		SLICER.Sliders.orbitSpeed = this.gui.add(SLICER.Params, 'orbitSpeed', -.1, .1).step(0.0005).name('orbitSpeed');
 
-		this.gui.add(SLICER.Params, 'randomizeAllValues').name('MORPH SHAPE');
+		SLICER.Sliders.colorOffset = this.gui.add(SLICER.Params, 'colorOffset', 0, 1).step(0.0005).name('colorOffset');
+		SLICER.Sliders.colorRange = this.gui.add(SLICER.Params, 'colorRange', .25, .5).step(0.0005).name('colorRange');
 
+		this.gui.add(SLICER.Params, 'randomizeAllValues').name('MORPH SHAPE');
+		this.gui.add(SLICER.Params, 'randomizeColor').name('UPDATE COLOR');
 
 		this.guiContainer = document.getElementById('guiContainer');
 		this.guiContainer.appendChild(this.gui.domElement);
@@ -119,8 +127,8 @@ SLICER.Params = function(name) {
 		}
 	}
 
-	this.randomizeAllValues = function() {
-		// trace("randomizeAllValues");
+	this.randomizeColor = function() {
+		// trace("randomizeColor");
 		var tweens = [];
 		var tween;
 
@@ -133,8 +141,41 @@ SLICER.Params = function(name) {
 			};
 		};
 
-		var getItemDelay = delayer(11);
+		var getItemDelay = delayer(2);
 
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.colorOffset,  param:SLICER.Params.colorOffset}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.colorRange, param:SLICER.Params.colorRange}));
+
+		tween = {
+			time:0,
+			duration:SLICER.Params.speed,
+			effect:'easeInOut',
+			start:0,
+			stop:1,
+			onStop:function(){
+				// scope.waiter();
+			},
+		}
+		tweens.push(tween);
+		$('#proxy').clear();
+		$('#proxy').tween(tweens).play();
+		return this;
+
+	};	
+	this.randomizeAllValues = function() {
+		// trace("randomizeAllValues");
+		var tweens = [];
+		var tween;
+
+		function delayer (total){
+			var order = shuffleArray(total);
+			var counter = 0;
+			return function(e){
+				return order[counter++]*SLICER.Params.delay;
+			};
+		};
+
+		var getItemDelay = delayer(11);
 
 		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.noiseAmount,  param:SLICER.Params.noiseAmount}));
 		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.noiseIntensity,  param:SLICER.Params.noiseIntensity}));
@@ -148,7 +189,6 @@ SLICER.Params = function(name) {
 		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.heightOffset,  param:SLICER.Params.heightOffset}));
 		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.groundHeight,  param:SLICER.Params.groundHeight}));
 		// tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.wrapAmount,  param:SLICER.Params.wrapAmount}));
-
 		tween = {
 			time:0,
 			duration:SLICER.Params.speed,
@@ -189,7 +229,7 @@ SLICER.Params = function(name) {
 	};
 
 	this.set3DScope = function(arg) {
-		this.slicer3D = arg;
+		this.scope3d = arg;
 		return this;
 	};
 

@@ -131,6 +131,19 @@ SLICER.Slicer3D = function(name) {
 	this.element_mouseDown = function(e){
 		trace("element_mouseDown")
 	};
+
+	this.randomizeColor = function() {
+		trace("randomizeColor");
+		var i;
+		var colorOffset = Math.random();
+		var colorRange = Math.random()*.25+.15;
+		for(i = 0; i < this.totalPlanesV; i++) {
+			this.customPlanes[i].material.color = new THREE.Color().setHSL( (i/this.totalPlanesV*colorRange + colorOffset)%1 , 1, .5);
+		}
+
+
+	};
+
 	this.resetTrackBall = function(){
 
 	};
@@ -197,9 +210,6 @@ SLICER.Slicer3D = function(name) {
 		this.particles = new THREE.ParticleSystem( geometry, material );
 		// this.base.add(this.particles);
 
-
-
-
 		var colorOffset = Math.random();
 		var colorRange = Math.random()*.25+.15;
 		this.customPlanes = [];
@@ -208,7 +218,7 @@ SLICER.Slicer3D = function(name) {
 			// main plane
 			material = new THREE.MeshLambertMaterial( { 
 				ambient: 0x000000, 
-				color: new THREE.Color().setHSL( (i/this.totalPlanesV*colorRange + colorOffset)%1 , 1, .5), //0x6699FF, 
+				color: new THREE.Color().setHSL( (i/this.totalPlanesV*colorRange + colorOffset)%1 , 1, .5), 
 				specular: 0x336699, 
 				shininess: 30, 
 				shading: THREE.SmoothShading,
@@ -250,7 +260,7 @@ SLICER.Slicer3D = function(name) {
 		material = new THREE.MeshPhongMaterial( { 
 			ambient: 0x333333, 
 			// color: 0x3336699, 
-			color: new THREE.Color().setHSL( (1*colorRange + colorOffset)%1 , 1, .35), //0x6699FF, 
+			color: new THREE.Color().setHSL( (1*colorRange + colorOffset)%1 , 1, .35), 
 			side:THREE.DoubleSide,
 			transparent: true,
 			opacity: .9,
@@ -439,6 +449,15 @@ SLICER.Slicer3D = function(name) {
 
 			heightCounter += heightCountIncrement;
 		}
+
+		// adjusts color
+		var colorOffset = SLICER.Params.colorOffset;
+		var colorRange = SLICER.Params.colorRange;
+
+		for(i = 0; i < this.totalPlanesV; i++) {
+			this.customPlanes[i].material.color = new THREE.Color().setHSL( (i/this.totalPlanesV*colorRange + colorOffset)%1 , 1, .5);
+		}
+		this.ground.material.color =  new THREE.Color().setHSL( (1*colorRange + colorOffset)%1 , 1, .25);
 
 		// assigns vertices from particles to planes
 		// order is refactored to traverse from x -> y to y -> x
