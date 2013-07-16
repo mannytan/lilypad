@@ -34,7 +34,7 @@ SLICER.Params = function(name) {
 			centerOffset: 0.001,
 			multiplier: 10.0005,
 			heightOffset: 10,
-			groundHeight: 10,
+			waterHeight: 10,
 			maxHeightRange: 1,
 			noiseSpeed: .05,
 			noiseAmount: .3,
@@ -82,7 +82,7 @@ SLICER.Params = function(name) {
 		SLICER.Sliders.maxHeightRange = this.gui.add(SLICER.Params, 'maxHeightRange', -1, 1).step(0.0005).name('maxHeightRange');
 		
 		SLICER.Sliders.heightOffset = this.gui.add(SLICER.Params, 'heightOffset', -50, 50).step(0.0005).name('heightOffset');
-		SLICER.Sliders.groundHeight = this.gui.add(SLICER.Params, 'groundHeight', -100, 50).step(0.0005).name('groundHeight');
+		SLICER.Sliders.waterHeight = this.gui.add(SLICER.Params, 'waterHeight', -100, 50).step(0.0005).name('waterHeight');
 
 		SLICER.Sliders.wrapAmount = this.gui.add(SLICER.Params, 'wrapAmount', 0, 1).step(0.0005).name('wrapAmount');
 		SLICER.Sliders.orbitSpeed = this.gui.add(SLICER.Params, 'orbitSpeed', -.1, .1).step(0.0005).name('orbitSpeed');
@@ -187,7 +187,7 @@ SLICER.Params = function(name) {
 		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.multiplier,  param:SLICER.Params.multiplier}));
 		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.maxHeightRange,  param:SLICER.Params.maxHeightRange}));
 		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.heightOffset,  param:SLICER.Params.heightOffset}));
-		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.groundHeight,  param:SLICER.Params.groundHeight}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.waterHeight,  param:SLICER.Params.waterHeight}));
 		// tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.wrapAmount,  param:SLICER.Params.wrapAmount}));
 		tween = {
 			time:0,

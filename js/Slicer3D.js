@@ -32,6 +32,7 @@ SLICER.Slicer3D = function(name) {
 
 	this.customPlanes = null;
 	this.customWirePlanes = null;
+	this.water = null;
 	this.ground = null;
 
 	this.particles = null;
@@ -62,7 +63,7 @@ SLICER.Slicer3D = function(name) {
 		this.base = new THREE.Object3D();
 		this.scene.add(this.base);
 
-		this.camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 2000 );
+		this.camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 3000 );
 		this.camera.position.x = 100;
 		this.camera.position.y = 50;
 		this.camera.position.z = 400;
@@ -150,27 +151,62 @@ SLICER.Slicer3D = function(name) {
 	this.createBackgroundElements = function() {
 		// create box
 		var color = 0x000000;
-		var width = 600;
+		var width = 1000;
 		var height = 600;
-		var depth = 600;
+		var depth = 1000;
 		var geometry, 
 			material;
+
+		var colorOffset = SLICER.Params.colorOffset;
+		var colorRange = SLICER.Params.colorRange;
 		//  -------------------------------------
 		//  draw cube
 		//  -------------------------------------
 		this.base.remove(this.cube);
 		material = new THREE.MeshBasicMaterial({
-			color: color,
- 			transparent: true,
- 			opacity: 0.05,
+			color: 0x000000,
+			transparent: true,
+			opacity: 0.05,
 			wireframe:true
 		});
 		geometry = new THREE.CubeGeometry(width, height, depth);
 		this.cube = new THREE.Mesh(geometry, material);
-
 		this.base.add(this.cube);
 
 
+		// water
+		material = new THREE.MeshPhongMaterial( { 
+			ambient: 0x333333, 
+			color: new THREE.Color().setHSL( (1*colorRange + colorOffset)%1 , 1, .5), 
+			side:THREE.DoubleSide,
+			transparent: true,
+			opacity: .9,
+			specular: 0x050505 } );
+		geometry = new THREE.PlaneGeometry( width, depth );
+
+		this.water = new THREE.Mesh( geometry, material );
+		this.water.rotation.x = -Math.PI/2;
+		this.water.position.y = -100;
+		this.base.add( this.water );
+		this.water.receiveShadow = true;
+
+		// ground
+		material = new THREE.MeshPhongMaterial( { 
+			ambient: 0x333333, 
+			color: new THREE.Color().setHSL( (1*colorRange + colorOffset)%1 , .5, .125), 
+			side:THREE.DoubleSide,
+			transparent: true,
+			opacity: .9,
+			specular: 0x050505 } );
+		geometry = new THREE.PlaneGeometry( width, depth );
+
+		this.ground = new THREE.Mesh( geometry, material );
+		this.ground.rotation.x = -Math.PI/2;
+		this.ground.position.y = -height*0.5;
+		this.base.add( this.ground );
+		this.ground.receiveShadow = true;
+
+/*
 		//  -------------------------------------
 		//  draw center line
 		//  -------------------------------------
@@ -187,7 +223,7 @@ SLICER.Slicer3D = function(name) {
 		var line = new THREE.Line(geometry, material);
 		line.type = THREE.Lines;
 		this.base.add(line);
-
+*/
 	};
 
 	this.createForegroundElements = function() {
@@ -210,8 +246,9 @@ SLICER.Slicer3D = function(name) {
 		this.particles = new THREE.ParticleSystem( geometry, material );
 		// this.base.add(this.particles);
 
-		var colorOffset = Math.random();
-		var colorRange = Math.random()*.25+.15;
+		var colorOffset = SLICER.Params.colorOffset;
+		var colorRange = SLICER.Params.colorRange;
+
 		this.customPlanes = [];
 		for(i = 0; i < this.totalPlanesV; i++) {
 			geometry = this.getCustomGeometry(this.totalPlanesH, i, i*30, 30);
@@ -257,22 +294,7 @@ SLICER.Slicer3D = function(name) {
 			this.customWirePlanes.push(customPlane);
 		}
 
-		material = new THREE.MeshPhongMaterial( { 
-			ambient: 0x333333, 
-			// color: 0x3336699, 
-			color: new THREE.Color().setHSL( (1*colorRange + colorOffset)%1 , 1, .35), 
-			side:THREE.DoubleSide,
-			transparent: true,
-			opacity: .9,
-			specular: 0x050505 } );
-		geometry = new THREE.PlaneGeometry( 1000, 1000 );
-		// material.color.setHSL( 0.000, .55, 1.0 );
 
-		this.ground = new THREE.Mesh( geometry, material );
-		this.ground.rotation.x = -Math.PI/2;
-		this.ground.position.y = -100;
-		this.base.add( this.ground );
-		this.ground.receiveShadow = true;
 	};
 
 
@@ -363,7 +385,7 @@ SLICER.Slicer3D = function(name) {
 		var centerRadius = SLICER.Params.centerRadius;
 		var centerOffset = SLICER.Params.centerOffset;
 
-		var groundHeight = SLICER.Params.groundHeight;
+		var waterHeight = SLICER.Params.waterHeight;
 		var outerRadius = SLICER.Params.radius;
 		var radiusRange = SLICER.Params.radiusRange;
 		var wrapAmount = SLICER.Params.wrapAmount;
@@ -457,7 +479,8 @@ SLICER.Slicer3D = function(name) {
 		for(i = 0; i < this.totalPlanesV; i++) {
 			this.customPlanes[i].material.color = new THREE.Color().setHSL( (i/this.totalPlanesV*colorRange + colorOffset)%1 , 1, .5);
 		}
-		this.ground.material.color =  new THREE.Color().setHSL( (1*colorRange + colorOffset)%1 , 1, .25);
+		this.water.material.color =  new THREE.Color().setHSL( (1*colorRange + colorOffset)%1 , 1, .25);
+		this.ground.material.color =  new THREE.Color().setHSL( (1*colorRange + colorOffset)%1 , .5, .05);
 
 		// assigns vertices from particles to planes
 		// order is refactored to traverse from x -> y to y -> x
@@ -483,7 +506,7 @@ SLICER.Slicer3D = function(name) {
 		this.count+=noiseSpeed*.1;
 
 		// changes the y position of the ground relative to shape
-		this.ground.position.y = groundHeight;
+		this.water.position.y = waterHeight;
 	};
 
 	this.draw = function() {
