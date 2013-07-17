@@ -175,7 +175,7 @@ SLICER.Params = function(name) {
 			};
 		};
 
-		var getItemDelay = delayer(11);
+		var getItemDelay = delayer(13);
 
 		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.noiseAmount,  param:SLICER.Params.noiseAmount}));
 		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.noiseIntensity,  param:SLICER.Params.noiseIntensity}));
@@ -188,6 +188,10 @@ SLICER.Params = function(name) {
 		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.maxHeightRange,  param:SLICER.Params.maxHeightRange}));
 		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.heightOffset,  param:SLICER.Params.heightOffset}));
 		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.waterHeight,  param:SLICER.Params.waterHeight}));
+
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.colorSpeed,  param:SLICER.Params.colorSpeed}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.colorRange, param:SLICER.Params.colorRange}));
+
 		// tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.wrapAmount,  param:SLICER.Params.wrapAmount}));
 		tween = {
 			time:0,

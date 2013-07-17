@@ -48,6 +48,7 @@ SLICER.Slicer3D = function(name) {
 
 	this.colorOffset = 0;
 
+	this.stirLine = null;
 	this.init = function() {
 		this.traceFunction("init");
 
@@ -196,24 +197,26 @@ SLICER.Slicer3D = function(name) {
 		this.base.add( this.ground );
 		this.ground.receiveShadow = true;
 
-/*
+
 		//  -------------------------------------
 		//  draw center line
 		//  -------------------------------------
 		material = new THREE.LineBasicMaterial({
 			color: 0x000000,
+			transparent:true, 
+			opacity:.5,
 			lineWidth: 1
 		});
 		geometry = new THREE.Geometry();
 		geometry.vertices.push(
-			new THREE.Vector3(0, 0, 200), 
-			new THREE.Vector3(0, 0, -200)
+			new THREE.Vector3(0, 100, 0), 
+			new THREE.Vector3(0, -100, 0 )
 		);
-		this.base.remove(this.line);
-		var line = new THREE.Line(geometry, material);
-		line.type = THREE.Lines;
-		this.base.add(line);
-*/
+		this.base.remove(this.stirLine);
+		this.stirLine = new THREE.Line(geometry, material);
+		this.stirLine.type = THREE.Lines;
+		this.base.add(this.stirLine);
+
 	};
 
 	this.createForegroundElements = function() {
@@ -462,6 +465,13 @@ SLICER.Slicer3D = function(name) {
 			heightCounter += heightCountIncrement;
 		}
 
+		percentage = (this.centerCount)*TWO_PI;
+		centerX = Math.cos(percentage)*centerRadius*(j/this.totalVerticesV*2-1 + centerOffset);
+		centerZ = Math.sin(percentage)*centerRadius*(j/this.totalVerticesV*2-1 + centerOffset);
+
+		this.stirLine.position.x = centerX;
+		this.stirLine.position.z = centerZ;
+
 		// adjusts color
 		this.colorOffset += SLICER.Params.colorSpeed;
 		var colorRange = SLICER.Params.colorRange;
@@ -469,8 +479,8 @@ SLICER.Slicer3D = function(name) {
 		for(i = 0; i < this.totalPlanesV; i++) {
 			this.customPlanes[i].material.color = new THREE.Color().setHSL( (i/this.totalPlanesV*colorRange + this.colorOffset)%1 , .75, .5);
 		}
-		this.water.material.color =  new THREE.Color().setHSL( (1*colorRange + this.colorOffset)%1 , 1, .25);
-		this.ground.material.color =  new THREE.Color().setHSL( (1*colorRange + this.colorOffset)%1 , .5, .05);
+		this.water.material.color =  new THREE.Color().setHSL( (1*(colorRange) + this.colorOffset+.125)%1 , 1, .25);
+		this.ground.material.color =  new THREE.Color().setHSL( (1*(colorRange) + this.colorOffset+.125)%1 , .5, .05);
 
 		// assigns vertices from particles to planes
 		// order is refactored to traverse from x -> y to y -> x
