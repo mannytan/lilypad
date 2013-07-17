@@ -40,7 +40,7 @@ SLICER.Params = function(name) {
 			noiseAmount: .3,
 			noiseIntensity:1,
 			speed: 3.25,
-			colorOffset:.35,
+			colorSpeed:.0001,
 			colorRange:.5,
 			wrapAmount: 0.99999,
 			delay: 0.001,
@@ -87,8 +87,8 @@ SLICER.Params = function(name) {
 		SLICER.Sliders.wrapAmount = this.gui.add(SLICER.Params, 'wrapAmount', 0, 1).step(0.0005).name('wrapAmount');
 		SLICER.Sliders.orbitSpeed = this.gui.add(SLICER.Params, 'orbitSpeed', -.1, .1).step(0.0005).name('orbitSpeed');
 
-		SLICER.Sliders.colorOffset = this.gui.add(SLICER.Params, 'colorOffset', 0, 1).step(0.0005).name('colorOffset');
-		SLICER.Sliders.colorRange = this.gui.add(SLICER.Params, 'colorRange', .25, .5).step(0.0005).name('colorRange');
+		SLICER.Sliders.colorSpeed = this.gui.add(SLICER.Params, 'colorSpeed', -.001, .001).step(0.0005).name('colorSpeed');
+		SLICER.Sliders.colorRange = this.gui.add(SLICER.Params, 'colorRange', .0, .5).step(0.0005).name('colorRange');
 
 		this.gui.add(SLICER.Params, 'randomizeAllValues').name('MORPH SHAPE');
 		this.gui.add(SLICER.Params, 'randomizeColor').name('UPDATE COLOR');
@@ -143,7 +143,7 @@ SLICER.Params = function(name) {
 
 		var getItemDelay = delayer(2);
 
-		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.colorOffset,  param:SLICER.Params.colorOffset}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.colorSpeed,  param:SLICER.Params.colorSpeed}));
 		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.colorRange, param:SLICER.Params.colorRange}));
 
 		tween = {

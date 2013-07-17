@@ -46,6 +46,8 @@ SLICER.Slicer3D = function(name) {
 	this.maxHeightCache = null;
 	this.maxHeightCacheSize = 20;
 
+	this.colorOffset = 0;
+
 	this.init = function() {
 		this.traceFunction("init");
 
@@ -133,18 +135,6 @@ SLICER.Slicer3D = function(name) {
 		trace("element_mouseDown")
 	};
 
-	this.randomizeColor = function() {
-		trace("randomizeColor");
-		var i;
-		var colorOffset = Math.random();
-		var colorRange = Math.random()*.25+.15;
-		for(i = 0; i < this.totalPlanesV; i++) {
-			this.customPlanes[i].material.color = new THREE.Color().setHSL( (i/this.totalPlanesV*colorRange + colorOffset)%1 , 1, .5);
-		}
-
-
-	};
-
 	this.resetTrackBall = function(){
 
 	};
@@ -157,7 +147,7 @@ SLICER.Slicer3D = function(name) {
 		var geometry, 
 			material;
 
-		var colorOffset = SLICER.Params.colorOffset;
+		var colorSpeed = SLICER.Params.colorSpeed;
 		var colorRange = SLICER.Params.colorRange;
 		//  -------------------------------------
 		//  draw cube
@@ -177,7 +167,7 @@ SLICER.Slicer3D = function(name) {
 		// water
 		material = new THREE.MeshPhongMaterial( { 
 			ambient: 0x333333, 
-			color: new THREE.Color().setHSL( (1*colorRange + colorOffset)%1 , 1, .5), 
+			color: new THREE.Color().setHSL( (1*colorRange + colorSpeed)%1 , 1, .5), 
 			side:THREE.DoubleSide,
 			transparent: true,
 			opacity: .9,
@@ -193,7 +183,7 @@ SLICER.Slicer3D = function(name) {
 		// ground
 		material = new THREE.MeshPhongMaterial( { 
 			ambient: 0x333333, 
-			color: new THREE.Color().setHSL( (1*colorRange + colorOffset)%1 , .5, .125), 
+			color: new THREE.Color().setHSL( (1*colorRange + colorSpeed)%1 , .5, .125), 
 			side:THREE.DoubleSide,
 			transparent: true,
 			opacity: .9,
@@ -246,7 +236,7 @@ SLICER.Slicer3D = function(name) {
 		this.particles = new THREE.ParticleSystem( geometry, material );
 		// this.base.add(this.particles);
 
-		var colorOffset = SLICER.Params.colorOffset;
+		var colorSpeed = SLICER.Params.colorSpeed;
 		var colorRange = SLICER.Params.colorRange;
 
 		this.customPlanes = [];
@@ -255,7 +245,7 @@ SLICER.Slicer3D = function(name) {
 			// main plane
 			material = new THREE.MeshLambertMaterial( { 
 				ambient: 0x000000, 
-				color: new THREE.Color().setHSL( (i/this.totalPlanesV*colorRange + colorOffset)%1 , 1, .5), 
+				color: new THREE.Color().setHSL( (i/this.totalPlanesV*colorRange + colorSpeed)%1 , 1, .5), 
 				specular: 0x336699, 
 				shininess: 30, 
 				shading: THREE.SmoothShading,
@@ -473,14 +463,14 @@ SLICER.Slicer3D = function(name) {
 		}
 
 		// adjusts color
-		var colorOffset = SLICER.Params.colorOffset;
+		this.colorOffset += SLICER.Params.colorSpeed;
 		var colorRange = SLICER.Params.colorRange;
 
 		for(i = 0; i < this.totalPlanesV; i++) {
-			this.customPlanes[i].material.color = new THREE.Color().setHSL( (i/this.totalPlanesV*colorRange + colorOffset)%1 , 1, .5);
+			this.customPlanes[i].material.color = new THREE.Color().setHSL( (i/this.totalPlanesV*colorRange + this.colorOffset)%1 , .75, .5);
 		}
-		this.water.material.color =  new THREE.Color().setHSL( (1*colorRange + colorOffset)%1 , 1, .25);
-		this.ground.material.color =  new THREE.Color().setHSL( (1*colorRange + colorOffset)%1 , .5, .05);
+		this.water.material.color =  new THREE.Color().setHSL( (1*colorRange + this.colorOffset)%1 , 1, .25);
+		this.ground.material.color =  new THREE.Color().setHSL( (1*colorRange + this.colorOffset)%1 , .5, .05);
 
 		// assigns vertices from particles to planes
 		// order is refactored to traverse from x -> y to y -> x
