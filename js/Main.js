@@ -4,10 +4,10 @@
  * Date: 03/20/12
  */
 
-var SLICER = SLICER || {};
+var LILYPAD = LILYPAD || {};
 
 
-SLICER.Main = function(name) {
+LILYPAD.Main = function(name) {
 	var scope = this;
 
 	UNCTRL.BoilerPlate.call(this);
@@ -29,24 +29,24 @@ SLICER.Main = function(name) {
 	this.stats.domElement.style.position = 'absolute';
 
 	// 3d
-	this.slicer3D = null;
+	this.lilyPad3D = null;
 
 	this.init = function() {
 		this.traceFunction("init");
 		this.createListeners();
 
-		this.gui = new SLICER.Params("Params");
+		this.gui = new LILYPAD.Params("Params");
 		this.gui.createGui();
 
-		this.slicer3D = new SLICER.Slicer3D("Slicer3D");
-		this.slicer3D.init();
-		this.slicer3D.setDimensions(this.stageWidth,this.stageHeight);
-		this.slicer3D.createEnvironment();
-		this.slicer3D.createBackgroundElements();
-		this.slicer3D.createForegroundElements();
-		this.slicer3D.createListeners();
+		this.lilyPad3D = new LILYPAD.LilyPad3D("LilyPad3D");
+		this.lilyPad3D.init();
+		this.lilyPad3D.setDimensions(this.stageWidth,this.stageHeight);
+		this.lilyPad3D.createEnvironment();
+		this.lilyPad3D.createBackgroundElements();
+		this.lilyPad3D.createForegroundElements();
+		this.lilyPad3D.createListeners();
 
-		this.gui.set3DScope(this.slicer3D);
+		this.gui.set3DScope(this.lilyPad3D);
 		this.gui.createListeners();
 
 		this.loader = document.getElementById('loader');
@@ -65,8 +65,8 @@ SLICER.Main = function(name) {
 
 	this.update = function() {
 
-		this.slicer3D.parse();
-		this.slicer3D.draw();
+		this.lilyPad3D.parse();
+		this.lilyPad3D.draw();
 		return this;
 	};
 
@@ -92,14 +92,14 @@ SLICER.Main = function(name) {
 
 	this.play = function() {
 		this.isPaused = false;
-		this.slicer3D.enableTrackBall();
+		this.lilyPad3D.enableTrackBall();
 		this.loop();
 		return this;
 	};
 
 	this.pause = function() {
 		this.isPaused = true;
-		this.slicer3D.disableTrackBall();
+		this.lilyPad3D.disableTrackBall();
 	};
 
 	this.createListeners = function() {
@@ -120,18 +120,18 @@ SLICER.Main = function(name) {
 	};
 
 	this.resize = function() {
-		this.stageWidth = window.innerWidth - SLICER.Params.guiWidth;
+		this.stageWidth = window.innerWidth - LILYPAD.Params.guiWidth;
 		this.stageHeight = window.innerHeight;
 
-		this.slicer3D.setDimensions(this.stageWidth,this.stageHeight);
-		this.slicer3D.resize();
+		this.lilyPad3D.setDimensions(this.stageWidth,this.stageHeight);
+		this.lilyPad3D.resize();
 
 		this.stats.domElement.style.top = (10) + 'px';
-		this.stats.domElement.style.right = (SLICER.Params.guiWidth + 10) + 'px';
+		this.stats.domElement.style.right = (LILYPAD.Params.guiWidth + 10) + 'px';
 
 	};
 
 };
 
-SLICER.Main.prototype = new UNCTRL.BoilerPlate();
-SLICER.Main.prototype.constructor = SLICER.Main;
+LILYPAD.Main.prototype = new UNCTRL.BoilerPlate();
+LILYPAD.Main.prototype.constructor = LILYPAD.Main;

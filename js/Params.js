@@ -4,12 +4,12 @@
  * Date: 03/20/12
  */
 
-var SLICER = SLICER || {};
+var LILYPAD = LILYPAD || {};
 
-SLICER.Params = {};
-SLICER.Sliders = {};
+LILYPAD.Params = {};
+LILYPAD.Sliders = {};
 
-SLICER.Params = function(name) {
+LILYPAD.Params = function(name) {
 	var scope = this;
 
 	UNCTRL.BoilerPlate.call(this);
@@ -24,7 +24,7 @@ SLICER.Params = function(name) {
 
 	this.createGui = function() {
 
-		SLICER.Params = {
+		LILYPAD.Params = {
 			orbitSpeed: 0.0015,
 			guiWidth: 250,
 			radius: 200,
@@ -54,7 +54,7 @@ SLICER.Params = function(name) {
 		};
 
 		this.gui = new dat.GUI({
-			width: SLICER.Params.guiWidth,
+			width: LILYPAD.Params.guiWidth,
 			// autoPlace: false
 		});
 
@@ -64,34 +64,34 @@ SLICER.Params = function(name) {
 			return false;
 		};
 
-		SLICER.Sliders.speed = this.gui.add(SLICER.Params, 'speed', 0.1, 5.0).step(0.0005).name('speed');
-		SLICER.Sliders.delay = this.gui.add(SLICER.Params, 'delay', 0.0, 5.0).step(0.0005).name('delay');
+		LILYPAD.Sliders.speed = this.gui.add(LILYPAD.Params, 'speed', 0.1, 5.0).step(0.0005).name('speed');
+		LILYPAD.Sliders.delay = this.gui.add(LILYPAD.Params, 'delay', 0.0, 5.0).step(0.0005).name('delay');
 
-		SLICER.Sliders.noiseSpeed = this.gui.add(SLICER.Params, 'noiseSpeed', -1, 1).step(0.0005).name('noiseSpeed');
-		SLICER.Sliders.noiseAmount = this.gui.add(SLICER.Params, 'noiseAmount', 0, 5).step(0.0005).name('noiseAmount');
-		SLICER.Sliders.noiseIntensity = this.gui.add(SLICER.Params, 'noiseIntensity', .25, 2).step(0.0005).name('noiseIntensity');
+		LILYPAD.Sliders.noiseSpeed = this.gui.add(LILYPAD.Params, 'noiseSpeed', -1, 1).step(0.0005).name('noiseSpeed');
+		LILYPAD.Sliders.noiseAmount = this.gui.add(LILYPAD.Params, 'noiseAmount', 0, 5).step(0.0005).name('noiseAmount');
+		LILYPAD.Sliders.noiseIntensity = this.gui.add(LILYPAD.Params, 'noiseIntensity', .25, 2).step(0.0005).name('noiseIntensity');
 		
-		SLICER.Sliders.radiusRange = this.gui.add(SLICER.Params, 'radiusRange', .5, 1).step(0.0005).name('radiusRange');
-		SLICER.Sliders.radius = this.gui.add(SLICER.Params, 'radius', 100, 400).step(0.0005).name('radius');
+		LILYPAD.Sliders.radiusRange = this.gui.add(LILYPAD.Params, 'radiusRange', .5, 1).step(0.0005).name('radiusRange');
+		LILYPAD.Sliders.radius = this.gui.add(LILYPAD.Params, 'radius', 100, 400).step(0.0005).name('radius');
 
-		SLICER.Sliders.centerRadius = this.gui.add(SLICER.Params, 'centerRadius', 0, 25).step(0.0005).name('centerRadius');
-		SLICER.Sliders.centerSpeed = this.gui.add(SLICER.Params, 'centerSpeed', -.125, .125).step(0.0005).name('centerSpeed');
-		SLICER.Sliders.centerOffset = this.gui.add(SLICER.Params, 'centerOffset', -2, 2).step(0.0005).name('centerOffset');
+		LILYPAD.Sliders.centerRadius = this.gui.add(LILYPAD.Params, 'centerRadius', 0, 25).step(0.0005).name('centerRadius');
+		LILYPAD.Sliders.centerSpeed = this.gui.add(LILYPAD.Params, 'centerSpeed', -.125, .125).step(0.0005).name('centerSpeed');
+		LILYPAD.Sliders.centerOffset = this.gui.add(LILYPAD.Params, 'centerOffset', -2, 2).step(0.0005).name('centerOffset');
 
-		SLICER.Sliders.multiplier = this.gui.add(SLICER.Params, 'multiplier', -15, 15).step(0.0005).name('multiplier');
-		SLICER.Sliders.maxHeightRange = this.gui.add(SLICER.Params, 'maxHeightRange', -1, 1).step(0.0005).name('maxHeightRange');
+		LILYPAD.Sliders.multiplier = this.gui.add(LILYPAD.Params, 'multiplier', -15, 15).step(0.0005).name('multiplier');
+		LILYPAD.Sliders.maxHeightRange = this.gui.add(LILYPAD.Params, 'maxHeightRange', -1, 1).step(0.0005).name('maxHeightRange');
 		
-		SLICER.Sliders.heightOffset = this.gui.add(SLICER.Params, 'heightOffset', -50, 50).step(0.0005).name('heightOffset');
-		SLICER.Sliders.waterHeight = this.gui.add(SLICER.Params, 'waterHeight', -100, 50).step(0.0005).name('waterHeight');
+		LILYPAD.Sliders.heightOffset = this.gui.add(LILYPAD.Params, 'heightOffset', -50, 50).step(0.0005).name('heightOffset');
+		LILYPAD.Sliders.waterHeight = this.gui.add(LILYPAD.Params, 'waterHeight', -100, 50).step(0.0005).name('waterHeight');
 
-		SLICER.Sliders.wrapAmount = this.gui.add(SLICER.Params, 'wrapAmount', 0, 1).step(0.0005).name('wrapAmount');
-		SLICER.Sliders.orbitSpeed = this.gui.add(SLICER.Params, 'orbitSpeed', -.1, .1).step(0.0005).name('orbitSpeed');
+		LILYPAD.Sliders.wrapAmount = this.gui.add(LILYPAD.Params, 'wrapAmount', 0, 1).step(0.0005).name('wrapAmount');
+		LILYPAD.Sliders.orbitSpeed = this.gui.add(LILYPAD.Params, 'orbitSpeed', -.1, .1).step(0.0005).name('orbitSpeed');
 
-		SLICER.Sliders.colorSpeed = this.gui.add(SLICER.Params, 'colorSpeed', -.001, .001).step(0.0005).name('colorSpeed');
-		SLICER.Sliders.colorRange = this.gui.add(SLICER.Params, 'colorRange', .0, .5).step(0.0005).name('colorRange');
+		LILYPAD.Sliders.colorSpeed = this.gui.add(LILYPAD.Params, 'colorSpeed', -.001, .001).step(0.0005).name('colorSpeed');
+		LILYPAD.Sliders.colorRange = this.gui.add(LILYPAD.Params, 'colorRange', .0, .5).step(0.0005).name('colorRange');
 
-		this.gui.add(SLICER.Params, 'randomizeAllValues').name('MORPH SHAPE');
-		this.gui.add(SLICER.Params, 'randomizeColor').name('UPDATE COLOR');
+		this.gui.add(LILYPAD.Params, 'randomizeAllValues').name('MORPH SHAPE');
+		this.gui.add(LILYPAD.Params, 'randomizeColor').name('UPDATE COLOR');
 
 		this.guiContainer = document.getElementById('guiContainer');
 		this.guiContainer.appendChild(this.gui.domElement);
@@ -118,7 +118,7 @@ SLICER.Params = function(name) {
 		})(slider);
 		return {
 			time:delayValue,
-			duration:SLICER.Params.speed,
+			duration:LILYPAD.Params.speed,
 			effect:'easeInOut',
 			start:param,
 			stop:endValue,
@@ -137,18 +137,18 @@ SLICER.Params = function(name) {
 			var order = shuffleArray(total);
 			var counter = 0;
 			return function(e){
-				return order[counter++]*SLICER.Params.delay;
+				return order[counter++]*LILYPAD.Params.delay;
 			};
 		};
 
 		var getItemDelay = delayer(2);
 
-		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.colorSpeed,  param:SLICER.Params.colorSpeed}));
-		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.colorRange, param:SLICER.Params.colorRange}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:LILYPAD.Sliders.colorSpeed,  param:LILYPAD.Params.colorSpeed}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:LILYPAD.Sliders.colorRange, param:LILYPAD.Params.colorRange}));
 
 		tween = {
 			time:0,
-			duration:SLICER.Params.speed,
+			duration:LILYPAD.Params.speed,
 			effect:'easeInOut',
 			start:0,
 			stop:1,
@@ -171,31 +171,31 @@ SLICER.Params = function(name) {
 			var order = shuffleArray(total);
 			var counter = 0;
 			return function(e){
-				return order[counter++]*SLICER.Params.delay;
+				return order[counter++]*LILYPAD.Params.delay;
 			};
 		};
 
 		var getItemDelay = delayer(13);
 
-		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.noiseAmount,  param:SLICER.Params.noiseAmount}));
-		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.noiseIntensity,  param:SLICER.Params.noiseIntensity}));
-		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.radiusRange,  param:SLICER.Params.radiusRange}));
-		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.radius,  param:SLICER.Params.radius}));
-		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.centerRadius,  param:SLICER.Params.centerRadius}));
-		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.centerSpeed,  param:SLICER.Params.centerSpeed}));
-		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.centerOffset,  param:SLICER.Params.centerOffset}));
-		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.multiplier,  param:SLICER.Params.multiplier}));
-		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.maxHeightRange,  param:SLICER.Params.maxHeightRange}));
-		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.heightOffset,  param:SLICER.Params.heightOffset}));
-		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.waterHeight,  param:SLICER.Params.waterHeight}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:LILYPAD.Sliders.noiseAmount,  param:LILYPAD.Params.noiseAmount}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:LILYPAD.Sliders.noiseIntensity,  param:LILYPAD.Params.noiseIntensity}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:LILYPAD.Sliders.radiusRange,  param:LILYPAD.Params.radiusRange}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:LILYPAD.Sliders.radius,  param:LILYPAD.Params.radius}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:LILYPAD.Sliders.centerRadius,  param:LILYPAD.Params.centerRadius}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:LILYPAD.Sliders.centerSpeed,  param:LILYPAD.Params.centerSpeed}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:LILYPAD.Sliders.centerOffset,  param:LILYPAD.Params.centerOffset}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:LILYPAD.Sliders.multiplier,  param:LILYPAD.Params.multiplier}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:LILYPAD.Sliders.maxHeightRange,  param:LILYPAD.Params.maxHeightRange}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:LILYPAD.Sliders.heightOffset,  param:LILYPAD.Params.heightOffset}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:LILYPAD.Sliders.waterHeight,  param:LILYPAD.Params.waterHeight}));
 
-		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.colorSpeed,  param:SLICER.Params.colorSpeed}));
-		tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.colorRange, param:SLICER.Params.colorRange}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:LILYPAD.Sliders.colorSpeed,  param:LILYPAD.Params.colorSpeed}));
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:LILYPAD.Sliders.colorRange, param:LILYPAD.Params.colorRange}));
 
-		// tweens.push(this.createTween({ delay:getItemDelay(),  slider:SLICER.Sliders.wrapAmount,  param:SLICER.Params.wrapAmount}));
+		// tweens.push(this.createTween({ delay:getItemDelay(),  slider:LILYPAD.Sliders.wrapAmount,  param:LILYPAD.Params.wrapAmount}));
 		tween = {
 			time:0,
-			duration:SLICER.Params.speed,
+			duration:LILYPAD.Params.speed,
 			effect:'easeInOut',
 			start:0,
 			stop:1,
@@ -217,7 +217,7 @@ SLICER.Params = function(name) {
 
 		tween = {
 			time:0,
-			duration:SLICER.Params.speed*.5,
+			duration:LILYPAD.Params.speed*.5,
 			effect:'easeInOut',
 			start:0,
 			stop:1,
@@ -239,5 +239,5 @@ SLICER.Params = function(name) {
 
 };
 
-SLICER.Params.prototype = new UNCTRL.BoilerPlate();
-SLICER.Params.prototype.constructor = SLICER.Params;
+LILYPAD.Params.prototype = new UNCTRL.BoilerPlate();
+LILYPAD.Params.prototype.constructor = LILYPAD.Params;

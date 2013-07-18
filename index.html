@@ -3,7 +3,7 @@
 <html>
 
 <head>
-	<title>uncontrol :: fold</title>
+	<title>uncontrol :: lilyPad</title>
     <!-- css -->
 	<link type="text/css" href="./css/styles.css" rel="stylesheet"/>
  
@@ -31,7 +31,7 @@
     <!-- custom -->
 	<script type="text/javascript" src="./js/Params.js"></script>
 	<script type="text/javascript" src="./js/Main.js"></script>
-	<script type="text/javascript" src="./js/Slicer3D.js"></script>
+	<script type="text/javascript" src="./js/LilyPad3D.js"></script>
 
 	<script type="text/javascript" src="./js/modernizr.custom.31336.js"></script>
 	<script type="text/javascript">
@@ -40,8 +40,8 @@
 
 		if(Modernizr.webgl) {
 		$('#notification').html("Drop experiment<br>Loading 6.7MB MP3 ...")
-			var slicer = new SLICER.Main();
-			slicer.init();
+			var lilyPad = new LILYPAD.Main();
+			lilyPad.init();
 		} else {
 			$('body').append('<img id="noWebGL" src="./img/noWebGL.png" />');
 		}

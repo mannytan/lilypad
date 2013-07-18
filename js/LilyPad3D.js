@@ -5,12 +5,12 @@
  */
 
 
-SLICER.Slicer3D = function(name) {
+LILYPAD.LilyPad3D = function(name) {
 	var scope = this;
 
 	UNCTRL.BoilerPlate.call(this);
 
-	this.name = 'Slicer3D';
+	this.name = 'LilyPad3D';
 
 	// 3d vars
 	this.container = null;
@@ -148,8 +148,8 @@ SLICER.Slicer3D = function(name) {
 		var geometry, 
 			material;
 
-		var colorSpeed = SLICER.Params.colorSpeed;
-		var colorRange = SLICER.Params.colorRange;
+		var colorSpeed = LILYPAD.Params.colorSpeed;
+		var colorRange = LILYPAD.Params.colorRange;
 		//  -------------------------------------
 		//  draw cube
 		//  -------------------------------------
@@ -239,8 +239,8 @@ SLICER.Slicer3D = function(name) {
 		this.particles = new THREE.ParticleSystem( geometry, material );
 		// this.base.add(this.particles);
 
-		var colorSpeed = SLICER.Params.colorSpeed;
-		var colorRange = SLICER.Params.colorRange;
+		var colorSpeed = LILYPAD.Params.colorSpeed;
+		var colorRange = LILYPAD.Params.colorRange;
 
 		this.customPlanes = [];
 		for(i = 0; i < this.totalPlanesV; i++) {
@@ -368,27 +368,27 @@ SLICER.Slicer3D = function(name) {
 			geometry, 
 			material;
 
-		this.base.rotation.y += SLICER.Params.orbitSpeed;
+		this.base.rotation.y += LILYPAD.Params.orbitSpeed;
 
-		var centerSpeed = SLICER.Params.centerSpeed*.1;
-		var noiseSpeed = SLICER.Params.noiseSpeed;
-		var noiseAmount = SLICER.Params.noiseAmount;
-		var noiseIntensity = SLICER.Params.noiseIntensity;
-		var multiplier = SLICER.Params.multiplier;
-		var centerRadius = SLICER.Params.centerRadius;
-		var centerOffset = SLICER.Params.centerOffset;
+		var centerSpeed = LILYPAD.Params.centerSpeed*.1;
+		var noiseSpeed = LILYPAD.Params.noiseSpeed;
+		var noiseAmount = LILYPAD.Params.noiseAmount;
+		var noiseIntensity = LILYPAD.Params.noiseIntensity;
+		var multiplier = LILYPAD.Params.multiplier;
+		var centerRadius = LILYPAD.Params.centerRadius;
+		var centerOffset = LILYPAD.Params.centerOffset;
 
-		var waterHeight = SLICER.Params.waterHeight;
-		var outerRadius = SLICER.Params.radius;
-		var radiusRange = SLICER.Params.radiusRange;
-		var wrapAmount = SLICER.Params.wrapAmount;
+		var waterHeight = LILYPAD.Params.waterHeight;
+		var outerRadius = LILYPAD.Params.radius;
+		var radiusRange = LILYPAD.Params.radiusRange;
+		var wrapAmount = LILYPAD.Params.wrapAmount;
 		var spikes = 0;
 		var maxHeight = 0;
 
 		var heightCountIncrement = (multiplier*2-multiplier)
 
-		var heightOffset = SLICER.Params.heightOffset;
-		var maxHeightRange = SLICER.Params.maxHeightRange;
+		var heightOffset = LILYPAD.Params.heightOffset;
+		var maxHeightRange = LILYPAD.Params.maxHeightRange;
 		var heightCounter = -(this.totalVerticesV-1)*.5 * heightCountIncrement;
 
 		var heightExtra = 0;
@@ -413,7 +413,7 @@ SLICER.Slicer3D = function(name) {
 				fold *= noiseIntensity;
 
 				// spikes calculation
-				outerRadius = SLICER.Params.radius - j/(this.totalVerticesV-1)*radiusRange * SLICER.Params.radius;
+				outerRadius = LILYPAD.Params.radius - j/(this.totalVerticesV-1)*radiusRange * LILYPAD.Params.radius;
 				spikes = outerRadius - fold*outerRadius;
 				maxHeight = fold*multiplier*10;
 				heightCountIncrement = (multiplier*2-multiplier)
@@ -473,8 +473,8 @@ SLICER.Slicer3D = function(name) {
 		this.stirLine.position.z = centerZ;
 
 		// adjusts color
-		this.colorOffset += SLICER.Params.colorSpeed;
-		var colorRange = SLICER.Params.colorRange;
+		this.colorOffset += LILYPAD.Params.colorSpeed;
+		var colorRange = LILYPAD.Params.colorRange;
 
 		for(i = 0; i < this.totalPlanesV; i++) {
 			this.customPlanes[i].material.color = new THREE.Color().setHSL( (i/this.totalPlanesV*colorRange + this.colorOffset)%1 , .75, .5);
@@ -555,5 +555,5 @@ SLICER.Slicer3D = function(name) {
 
 };
 
-SLICER.Slicer3D.prototype = new UNCTRL.BoilerPlate();
-SLICER.Slicer3D.prototype.constructor = SLICER.Slicer3D;
+LILYPAD.LilyPad3D.prototype = new UNCTRL.BoilerPlate();
+LILYPAD.LilyPad3D.prototype.constructor = LILYPAD.LilyPad3D;
