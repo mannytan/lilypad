@@ -175,8 +175,9 @@ LILYPAD.Params = function(name) {
 			};
 		};
 
-		var getItemDelay = delayer(13);
+		var getItemDelay = delayer(14);
 
+		tweens.push(this.createTween({ delay:getItemDelay(),  slider:LILYPAD.Sliders.noiseSpeed,  param:LILYPAD.Params.noiseSpeed}));
 		tweens.push(this.createTween({ delay:getItemDelay(),  slider:LILYPAD.Sliders.noiseAmount,  param:LILYPAD.Params.noiseAmount}));
 		tweens.push(this.createTween({ delay:getItemDelay(),  slider:LILYPAD.Sliders.noiseIntensity,  param:LILYPAD.Params.noiseIntensity}));
 		tweens.push(this.createTween({ delay:getItemDelay(),  slider:LILYPAD.Sliders.radiusRange,  param:LILYPAD.Params.radiusRange}));
