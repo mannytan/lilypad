@@ -17,6 +17,8 @@ LILYPAD.LilyPad3D = function(name) {
 	this.projector = null;
 	this.camera = null;
 	this.scene = null;
+	this.raycaster = null;
+	this.intersected = null;
 	this.controls = null;
 	this.cube = null;
 
@@ -46,7 +48,7 @@ LILYPAD.LilyPad3D = function(name) {
 	this.maxHeightCache = null;
 	this.maxHeightCacheSize = 20;
 
-	this.colorOffset = 0;
+	this.colorOffset = .5;
 
 	this.stirLine = null;
 	this.init = function() {
@@ -66,9 +68,12 @@ LILYPAD.LilyPad3D = function(name) {
 		this.base = new THREE.Object3D();
 		this.scene.add(this.base);
 
+		this.raycaster = new THREE.Raycaster();
+
+
 		this.camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 3000 );
-		this.camera.position.x = 100;
-		this.camera.position.y = 50;
+		this.camera.position.x = 0;
+		this.camera.position.y = 300;
 		this.camera.position.z = 400;
 
 		this.controls = new THREE.TrackballControls( this.camera, document.getElementById('container3D'));
@@ -133,12 +138,54 @@ LILYPAD.LilyPad3D = function(name) {
 
 	};
 	this.element_mouseDown = function(e){
-		trace("element_mouseDown")
-	};
-
-	this.resetTrackBall = function(){
+		trace("element_mouseDown");
 
 	};
+
+
+	this.mouseDown = function(event) {
+
+		event.preventDefault();
+
+		if (event.target === this.renderer.domElement) {
+			this.traceFunction("mouseDown");
+
+			// created a ray that has the same vector as the camera and position of the cursor
+			var x = event.clientX - this.stageOffsetX;
+			var y = event.clientY - this.stageOffsetY;
+
+			var vector = new THREE.Vector3( x, y, 1 );
+			this.projector.unprojectVector( vector, this.camera );
+
+			this.raycaster.set( this.camera.position, vector.sub( this.camera.position ).normalize() );
+
+			var intersects = this.raycaster.intersectObjects( this.scene.children );
+
+			if ( intersects.length > 0 ) {
+
+				trace("hit")
+				if ( this.intersected != intersects[ 0 ].object ) {
+
+					if ( this.intersected ) this.intersected.material.emissive.setHex( this.intersected.currentHex );
+
+					this.intersected = intersects[ 0 ].object;
+					this.intersected.currentHex = this.intersected.material.emissive.getHex();
+					this.intersected.material.emissive.setHex( 0xff0000 );
+
+				}
+
+			} else {
+				trace("nohit")
+
+				if ( this.intersected ) this.intersected.material.emissive.setHex( this.intersected.currentHex );
+
+				this.intersected = null;
+
+			}
+		}
+	};
+
+
 	this.createBackgroundElements = function() {
 		// create box
 		var color = 0x000000;
@@ -150,6 +197,7 @@ LILYPAD.LilyPad3D = function(name) {
 
 		var colorSpeed = LILYPAD.Params.colorSpeed;
 		var colorRange = LILYPAD.Params.colorRange;
+
 		//  -------------------------------------
 		//  draw cube
 		//  -------------------------------------
@@ -162,7 +210,7 @@ LILYPAD.LilyPad3D = function(name) {
 		});
 		geometry = new THREE.CubeGeometry(width, height, depth);
 		this.cube = new THREE.Mesh(geometry, material);
-		this.base.add(this.cube);
+		// this.base.add(this.cube);
 
 
 		// water
@@ -203,19 +251,19 @@ LILYPAD.LilyPad3D = function(name) {
 		//  -------------------------------------
 		material = new THREE.LineBasicMaterial({
 			color: 0x000000,
-			transparent:true, 
-			opacity:.5,
-			lineWidth: 1
+			transparent: true,
+			opacity: 0.25,
+			wireframe:true
 		});
 		geometry = new THREE.Geometry();
 		geometry.vertices.push(
-			new THREE.Vector3(0, 100, 0), 
-			new THREE.Vector3(0, -100, 0 )
+			new THREE.Vector3(0, 200*.5, 0), 
+			new THREE.Vector3(0, 200*-5, 0 )
 		);
 		this.base.remove(this.stirLine);
 		this.stirLine = new THREE.Line(geometry, material);
 		this.stirLine.type = THREE.Lines;
-		this.base.add(this.stirLine);
+		// this.base.add(this.stirLine);
 
 	};
 
@@ -356,9 +404,9 @@ LILYPAD.LilyPad3D = function(name) {
 	};
 
 	this.createListeners = function() {
-		// this.container.addEventListener('mousedown', function(event) {
-		// 	scope.mouseDown(event);
-		// }, false);
+		this.container.addEventListener('mousedown', function(event) {
+			scope.mouseDown(event);
+		}, false);
 	};
 
 	this.parse = function() {
@@ -481,6 +529,10 @@ LILYPAD.LilyPad3D = function(name) {
 		}
 		this.water.material.color =  new THREE.Color().setHSL( (1*(colorRange) + this.colorOffset+.125)%1 , 1, .25);
 		this.ground.material.color =  new THREE.Color().setHSL( (1*(colorRange) + this.colorOffset+.125)%1 , .5, .05);
+
+		var clearColor =  new THREE.Color().setHSL( (1*(colorRange) + this.colorOffset+.15)%1 , 1.0, .75);
+		this.renderer.setClearColor(clearColor);
+
 
 		// assigns vertices from particles to planes
 		// order is refactored to traverse from x -> y to y -> x

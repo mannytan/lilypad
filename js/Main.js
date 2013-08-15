@@ -25,8 +25,8 @@ LILYPAD.Main = function(name) {
 	this.gui = null;
 
 	// stats
-	this.stats = new Stats();
-	this.stats.domElement.style.position = 'absolute';
+	// this.stats = new Stats();
+	// this.stats.domElement.style.position = 'absolute';
 
 	// 3d
 	this.lilyPad3D = null;
@@ -47,10 +47,10 @@ LILYPAD.Main = function(name) {
 		this.lilyPad3D.createListeners();
 
 		this.gui.set3DScope(this.lilyPad3D);
-		this.gui.createListeners();
+		// this.gui.createListeners();
 
 		this.loader = document.getElementById('loader');
-		document.body.appendChild(this.stats.domElement);
+		// document.body.appendChild(this.stats.domElement);
 
 		// stop the user getting a text cursor
 		document.onselectStart = function() {
@@ -71,7 +71,7 @@ LILYPAD.Main = function(name) {
 	};
 
 	this.loop = function() {
-		this.stats.update();
+		// this.stats.update();
 		this.update();
 		if (this.isPaused) {
 			return this;
@@ -126,8 +126,8 @@ LILYPAD.Main = function(name) {
 		this.lilyPad3D.setDimensions(this.stageWidth,this.stageHeight);
 		this.lilyPad3D.resize();
 
-		this.stats.domElement.style.top = (10) + 'px';
-		this.stats.domElement.style.right = (LILYPAD.Params.guiWidth + 10) + 'px';
+		// this.stats.domElement.style.top = (10) + 'px';
+		// this.stats.domElement.style.right = (LILYPAD.Params.guiWidth + 10) + 'px';
 
 	};
 
