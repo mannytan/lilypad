@@ -136,7 +136,7 @@ LILYPAD.Params = function(name) {
 
 	this.randomizeTotalNumbers = function() {
 		trace("randomizeTotalNumbers");
-		window.location.href=window.location.pathname + "?totalWidth=" +((Math.random()*20)|0)+ "&totalDepth=" + ((Math.random()*20)|0);
+		window.location.href=window.location.pathname + "?totalWidth=" +((Math.random()*20)|0 + 2)+ "&totalDepth=" + ((Math.random()*20)|0 + 2);
 		return this;
 	};
 	
