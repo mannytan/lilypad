@@ -35,16 +35,24 @@ LILYPAD.Main = function(name) {
 		this.traceFunction("init");
 		this.createListeners();
 
+
 		this.gui = new LILYPAD.Params("Params");
+		this.gui.addEventListener("TOGGLE_VIEW", function() {
+			scope.lilyPad3D.toggleWireFrame();
+		});
 		this.gui.createGui();
 
 		this.lilyPad3D = new LILYPAD.LilyPad3D("LilyPad3D");
+		this.lilyPad3D.addEventListener("MORPH_SHAPE", function() {
+			// scope.gui.randomizeAllValues();
+		});
 		this.lilyPad3D.init();
 		this.lilyPad3D.setDimensions(this.stageWidth,this.stageHeight);
 		this.lilyPad3D.createEnvironment();
 		this.lilyPad3D.createBackgroundElements();
 		this.lilyPad3D.createForegroundElements();
 		this.lilyPad3D.createListeners();
+		
 
 		this.gui.set3DScope(this.lilyPad3D);
 		// this.gui.createListeners();

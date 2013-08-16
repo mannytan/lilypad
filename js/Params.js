@@ -50,6 +50,9 @@ LILYPAD.Params = function(name) {
 			randomizeColor: function(){
 				scope.randomizeColor();
 			},
+			toggleView: function(){
+				scope.toggleView();
+			},
 			randomizeTotalNumbers: function(){
 				scope.randomizeTotalNumbers();
 			}
@@ -67,7 +70,7 @@ LILYPAD.Params = function(name) {
 			return false;
 		};
 
-		var f1 = this.gui.addFolder('PARAMATERS');
+		var f1 = this.gui.addFolder('PARAMETERS');
 
 		LILYPAD.Sliders.speed = f1.add(LILYPAD.Params, 'speed', 0.1, 5.0).step(0.0005).name('speed');
 		LILYPAD.Sliders.delay = f1.add(LILYPAD.Params, 'delay', 0.0, 5.0).step(0.0005).name('delay');
@@ -98,7 +101,7 @@ LILYPAD.Params = function(name) {
 		this.gui.add(LILYPAD.Params, 'randomizeAllValues').name('MORPH SHAPE');
 		this.gui.add(LILYPAD.Params, 'randomizeColor').name('UPDATE COLOR');
 		this.gui.add(LILYPAD.Params, 'randomizeTotalNumbers').name('CHANGE RES');
-
+		this.gui.add(LILYPAD.Params, 'toggleView').name('CHANGE VIEW');
 
 		this.guiContainer = document.getElementById('guiContainer');
 		this.guiContainer.appendChild(this.gui.domElement);
@@ -133,6 +136,14 @@ LILYPAD.Params = function(name) {
 			onStop:setter,
 		}
 	}
+
+
+	this.toggleView = function() {
+		trace("toggleView");
+		this.dispatchEvent("TOGGLE_VIEW",[]);
+		return this;
+	};
+
 
 	this.randomizeTotalNumbers = function() {
 		trace("randomizeTotalNumbers");

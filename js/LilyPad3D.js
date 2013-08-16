@@ -51,6 +51,10 @@ LILYPAD.LilyPad3D = function(name) {
 	this.colorOffset = .5;
 
 	this.stirLine = null;
+
+	this.sphereTop = null;
+	this.sphereBottom = null;
+
 	this.init = function() {
 		this.traceFunction("init");
 
@@ -67,9 +71,6 @@ LILYPAD.LilyPad3D = function(name) {
 		this.scene = new THREE.Scene();
 		this.base = new THREE.Object3D();
 		this.scene.add(this.base);
-
-		this.raycaster = new THREE.Raycaster();
-
 
 		this.camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 3000 );
 		this.camera.position.x = 0;
@@ -130,58 +131,34 @@ LILYPAD.LilyPad3D = function(name) {
 		this.renderer.shadowMapEnabled = true;
 		this.renderer.shadowMapCullFace = THREE.CullFaceBack;
 
-
 		this.container = document.getElementById('container3D');
 		this.container.appendChild(this.renderer.domElement);
 
 		// this.container.addEventListener('mousedown', this.element_mouseDown);
 
 	};
-	this.element_mouseDown = function(e){
-		trace("element_mouseDown");
 
+	this.createListeners = function() {
+		this.container.addEventListener('mousedown', function(event) {
+			scope.onDocumentMouseDown(event);
+		}, false);
+		
 	};
 
-
-	this.mouseDown = function(event) {
-
+	this.onDocumentMouseDown = function(event) {
 		event.preventDefault();
 
-		if (event.target === this.renderer.domElement) {
-			this.traceFunction("mouseDown");
+		var mouse = new THREE.Vector2();
+		mouse.x = ( event.clientX / (window.innerWidth-LILYPAD.Params.guiWidth) ) * 2 - 1;
+		mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+		var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 );
+		this.projector.unprojectVector( vector, this.camera );
+		var raycaster = new THREE.Raycaster( this.camera.position, vector.sub( this.camera.position ).normalize() );
+		var intersects = raycaster.intersectObjects( [this.water] );
+		if ( intersects.length > 0 ) {
+			this.dispatchEvent("MORPH_SHAPE",[]);
+		} else {
 
-			// created a ray that has the same vector as the camera and position of the cursor
-			var x = event.clientX - this.stageOffsetX;
-			var y = event.clientY - this.stageOffsetY;
-
-			var vector = new THREE.Vector3( x, y, 1 );
-			this.projector.unprojectVector( vector, this.camera );
-
-			this.raycaster.set( this.camera.position, vector.sub( this.camera.position ).normalize() );
-
-			var intersects = this.raycaster.intersectObjects( this.scene.children );
-
-			if ( intersects.length > 0 ) {
-
-				trace("hit")
-				if ( this.intersected != intersects[ 0 ].object ) {
-
-					if ( this.intersected ) this.intersected.material.emissive.setHex( this.intersected.currentHex );
-
-					this.intersected = intersects[ 0 ].object;
-					this.intersected.currentHex = this.intersected.material.emissive.getHex();
-					this.intersected.material.emissive.setHex( 0xff0000 );
-
-				}
-
-			} else {
-				trace("nohit")
-
-				if ( this.intersected ) this.intersected.material.emissive.setHex( this.intersected.currentHex );
-
-				this.intersected = null;
-
-			}
 		}
 	};
 
@@ -221,7 +198,7 @@ LILYPAD.LilyPad3D = function(name) {
 			transparent: true,
 			opacity: .9,
 			specular: 0x050505 } );
-		geometry = new THREE.PlaneGeometry( width, depth );
+		geometry = new THREE.PlaneGeometry( width*10, depth*10 );
 
 		this.water = new THREE.Mesh( geometry, material );
 		this.water.rotation.x = -Math.PI/2;
@@ -237,7 +214,7 @@ LILYPAD.LilyPad3D = function(name) {
 			transparent: true,
 			opacity: .9,
 			specular: 0x050505 } );
-		geometry = new THREE.PlaneGeometry( width, depth );
+		geometry = new THREE.PlaneGeometry( width*10, depth*10 );
 
 		this.ground = new THREE.Mesh( geometry, material );
 		this.ground.rotation.x = -Math.PI/2;
@@ -245,25 +222,6 @@ LILYPAD.LilyPad3D = function(name) {
 		this.base.add( this.ground );
 		this.ground.receiveShadow = true;
 
-
-		//  -------------------------------------
-		//  draw center line
-		//  -------------------------------------
-		material = new THREE.LineBasicMaterial({
-			color: 0x000000,
-			transparent: true,
-			opacity: 0.25,
-			wireframe:true
-		});
-		geometry = new THREE.Geometry();
-		geometry.vertices.push(
-			new THREE.Vector3(0, 200*.5, 0), 
-			new THREE.Vector3(0, 200*-5, 0 )
-		);
-		this.base.remove(this.stirLine);
-		this.stirLine = new THREE.Line(geometry, material);
-		this.stirLine.type = THREE.Lines;
-		// this.base.add(this.stirLine);
 
 	};
 
@@ -278,14 +236,15 @@ LILYPAD.LilyPad3D = function(name) {
 		var percentage;
 
 		// backbone dots
-		material = new THREE.ParticleBasicMaterial( { color: 0x660066, size: 5} );
+		material = new THREE.ParticleBasicMaterial( { color: 0xFFFFFF, size: 1} );
 		geometry = new THREE.Geometry();
 		for(i = 0; i < this.totalVertices; i++) {
 			geometry.vertices.push(new THREE.Vector3());
 		}
 		
 		this.particles = new THREE.ParticleSystem( geometry, material );
-		// this.base.add(this.particles);
+		this.base.add(this.particles);
+		this.particles.visible = false;
 
 		var colorSpeed = LILYPAD.Params.colorSpeed;
 		var colorRange = LILYPAD.Params.colorRange;
@@ -325,16 +284,49 @@ LILYPAD.LilyPad3D = function(name) {
 
 
 		// wireframe plane
-		material = new THREE.MeshBasicMaterial( { color: 0xFFFFFF, wireframe:true, transparent:true, opacity:0.05, shading: THREE.FlatShading } )
+		material = new THREE.MeshBasicMaterial( { color: 0xFFFFFF, wireframe:true, transparent:true, opacity:0.05 } )
 		material.side = THREE.DoubleSide;
 		this.customWirePlanes = [];
 		for(i = 0; i < this.totalPlanesV; i++) {
 			geometry = this.getCustomGeometry(this.totalPlanesH, i, i*30, 30);
 			customPlane = new THREE.Mesh( geometry, material );
-			// this.base.add(customPlane);
+			this.base.add(customPlane);
+			customPlane.visible = false;
 			this.customWirePlanes.push(customPlane);
 		}
 
+		//  -------------------------------------
+		//  draw stir line
+		//  -------------------------------------
+		material = new THREE.LineBasicMaterial({ color: 0xFFFFFF, wireframe:false, transparent:true, opacity:0.25 });
+		geometry = new THREE.Geometry();
+		geometry.vertices.push(
+			new THREE.Vector3(0, 100, 0), 
+			new THREE.Vector3(0, 0, 0 )
+		);
+		this.stirLine = new THREE.Line(geometry, material);
+		this.stirLine.type = THREE.Lines;
+		this.base.add(this.stirLine);
+
+		material = new THREE.LineBasicMaterial({ color: 0xFFFFFF, wireframe:false, transparent:true, opacity:0.25});
+		geometry = new THREE.Geometry();
+		for(i = 0; i < this.totalVerticesH; i++) {
+			geometry.vertices.push(new THREE.Vector3(Math.random()*100-50, Math.random()*100-50, Math.random()*100-50 ));
+		}
+
+		this.sphereTop = new THREE.Line( geometry, material );
+		this.sphereTop.type = THREE.LineStrip;
+		this.base.add(this.sphereTop);
+
+		//  -------------------------------------
+		//  sphere
+		//  -------------------------------------
+		geometry = new THREE.SphereGeometry( 1, 5, 5 );
+		material = new THREE.MeshBasicMaterial( { color: 0xFFFFFF, wireframe:false, transparent:true, opacity:.5 } )
+		
+		
+		this.sphereBottom = new THREE.Mesh( geometry, material );
+		this.base.add(this.sphereBottom);
 
 	};
 
@@ -403,10 +395,23 @@ LILYPAD.LilyPad3D = function(name) {
 		return geometry;
 	};
 
-	this.createListeners = function() {
-		this.container.addEventListener('mousedown', function(event) {
-			scope.mouseDown(event);
-		}, false);
+	this.toggleWireFrame = function(){
+
+		var i,total = this.customPlanes.length;
+		if (this.particles.visible===false){
+			this.particles.visible = true;
+			for(i=0;i<total;i++){
+				this.customWirePlanes[i].visible = true;
+				this.customPlanes[i].visible = false;
+			}
+		} else {
+			this.particles.visible = false;
+			for(i=0;i<total;i++){
+				this.customWirePlanes[i].visible = false;
+				this.customPlanes[i].visible = true;
+			}
+		}
+
 	};
 
 	this.parse = function() {
@@ -485,11 +490,7 @@ LILYPAD.LilyPad3D = function(name) {
 					heightExtra -= maxHeight;
 				}
 
-				// percentage = i/(this.totalVerticesH-1.0) * TWO_PI * wrappMultiplier - wrappOffset;
 				percentage = i/(this.totalVerticesH-1.0) * TWO_PI * wrappMultiplier + wrappOffset;
-
-				// this.maxHeightCache[id].push(maxHeight*maxHeightRange + heightOffset);
-				// this.maxHeightCache[id].shift();
 
 				if(isEven && j%4==1 || isOdd && j%4==3){
 					geometry.vertices[id].x = Math.sin(percentage)*outerRadius + centerX;
@@ -503,10 +504,6 @@ LILYPAD.LilyPad3D = function(name) {
 					geometry.vertices[id].z = Math.cos(percentage)*outerRadius + centerZ;
 				}
 
-				// this.maxHeightCache[id].push(maxHeight*maxHeightRange + heightOffset);
-				// this.maxHeightCache[id].shift();
-				// geometry.vertices[id].y = this.maxHeightCache[id][0];
-
 				id++;
 			}
 
@@ -516,9 +513,6 @@ LILYPAD.LilyPad3D = function(name) {
 		percentage = (this.centerCount)*TWO_PI;
 		centerX = Math.cos(percentage)*centerRadius*(j/this.totalVerticesV*2-1 + centerOffset);
 		centerZ = Math.sin(percentage)*centerRadius*(j/this.totalVerticesV*2-1 + centerOffset);
-
-		this.stirLine.position.x = centerX;
-		this.stirLine.position.z = centerZ;
 
 		// adjusts color
 		this.colorOffset += LILYPAD.Params.colorSpeed;
@@ -554,6 +548,38 @@ LILYPAD.LilyPad3D = function(name) {
 			}
 		}
 
+		var scalar = 4;//centerRadius*centerOffset;
+
+		// waterHeight = maxHeight*maxHeightRange + heightOffset; //heightCounter+heightExtra;
+		// waterHeight = heightCounter+heightExtra; 
+
+
+		outerRadius = LILYPAD.Params.radius - LILYPAD.Params.radius*radiusRange;
+		for(j = 0; j < this.totalVerticesH; j++) {
+			percentage = j/(this.totalVerticesH-1)*TWO_PI;
+			this.sphereTop.geometry.vertices[j].x = Math.cos(percentage)*outerRadius + 0;
+			this.sphereTop.geometry.vertices[j].y = 200 + waterHeight;
+			this.sphereTop.geometry.vertices[j].z = Math.sin(percentage)*outerRadius + 0;
+		}
+
+		scalar = 2;
+		this.sphereBottom.scale.set(scalar,scalar,scalar);
+		percentage = (this.centerCount)*TWO_PI;
+
+		this.stirLine.geometry.vertices[0].x = centerX;
+		this.stirLine.geometry.vertices[0].y = waterHeight;
+		this.stirLine.geometry.vertices[0].z = centerZ;
+
+		this.stirLine.geometry.vertices[1].x = Math.cos(percentage)*outerRadius + 0;
+		this.stirLine.geometry.vertices[1].y = 200+waterHeight;
+		this.stirLine.geometry.vertices[1].z = Math.sin(percentage)*outerRadius + 0;
+
+
+		this.sphereBottom.position.x = centerX;
+		this.sphereBottom.position.y = waterHeight;
+		this.sphereBottom.position.z = centerZ;
+
+
 		this.centerCount+= centerSpeed;
 		this.count+=noiseSpeed*.1;
 
@@ -571,12 +597,14 @@ LILYPAD.LilyPad3D = function(name) {
 		// update particles
 		this.particles.geometry.verticesNeedUpdate = true;
 		
+		this.sphereTop.geometry.verticesNeedUpdate = true;
+		this.stirLine.geometry.verticesNeedUpdate = true;
+
 		// update shapes
 		for(i = 0; i < this.customPlanes.length; i++) {
 			this.customPlanes[i].geometry.verticesNeedUpdate = true;
 			this.customWirePlanes[i].geometry.verticesNeedUpdate = true;
 		}
-		
 		
 		this.controls.update();
 		this.renderer.render( this.scene , this.camera );
