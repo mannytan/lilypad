@@ -52,6 +52,7 @@ LILYPAD.LilyPad3D = function(name) {
 
 	this.stirLine = null;
 
+	this.halo = null;
 	this.sphereTop = null;
 	this.sphereBottom = null;
 
@@ -189,7 +190,6 @@ LILYPAD.LilyPad3D = function(name) {
 		this.cube = new THREE.Mesh(geometry, material);
 		// this.base.add(this.cube);
 
-
 		// water
 		material = new THREE.MeshPhongMaterial( { 
 			ambient: 0x333333, 
@@ -197,8 +197,9 @@ LILYPAD.LilyPad3D = function(name) {
 			side:THREE.DoubleSide,
 			transparent: true,
 			opacity: .9,
-			specular: 0x050505 } );
-		geometry = new THREE.PlaneGeometry( width*10, depth*10 );
+			specular: 0x050505
+			 } );
+		geometry = new THREE.PlaneGeometry( width*10, depth*10 ,100,100);
 
 		this.water = new THREE.Mesh( geometry, material );
 		this.water.rotation.x = -Math.PI/2;
@@ -220,6 +221,7 @@ LILYPAD.LilyPad3D = function(name) {
 		this.ground.rotation.x = -Math.PI/2;
 		this.ground.position.y = -height*0.5;
 		this.base.add( this.ground );
+
 		this.ground.receiveShadow = true;
 
 
@@ -282,7 +284,6 @@ LILYPAD.LilyPad3D = function(name) {
 			}
 		}
 
-
 		// wireframe plane
 		material = new THREE.MeshBasicMaterial( { color: 0xFFFFFF, wireframe:true, transparent:true, opacity:0.05 } )
 		material.side = THREE.DoubleSide;
@@ -298,7 +299,7 @@ LILYPAD.LilyPad3D = function(name) {
 		//  -------------------------------------
 		//  draw stir line
 		//  -------------------------------------
-		material = new THREE.LineBasicMaterial({ color: 0xFFFFFF, wireframe:false, transparent:true, opacity:0.25 });
+		material = new THREE.LineBasicMaterial({ color: 0xFFFFFF, wireframe:true, linewidth:.5 });
 		geometry = new THREE.Geometry();
 		geometry.vertices.push(
 			new THREE.Vector3(0, 100, 0), 
@@ -308,25 +309,27 @@ LILYPAD.LilyPad3D = function(name) {
 		this.stirLine.type = THREE.Lines;
 		this.base.add(this.stirLine);
 
-		material = new THREE.LineBasicMaterial({ color: 0xFFFFFF, wireframe:false, transparent:true, opacity:0.25});
+		material = new THREE.LineBasicMaterial({ color: 0xFFFFFF, wireframe:true, linewidth:.5});
 		geometry = new THREE.Geometry();
 		for(i = 0; i < this.totalVerticesH; i++) {
 			geometry.vertices.push(new THREE.Vector3(Math.random()*100-50, Math.random()*100-50, Math.random()*100-50 ));
 		}
 
-		this.sphereTop = new THREE.Line( geometry, material );
-		this.sphereTop.type = THREE.LineStrip;
-		this.base.add(this.sphereTop);
+		this.halo = new THREE.Line( geometry, material );
+		this.halo.type = THREE.LineStrip;
+		this.base.add(this.halo);
 
 		//  -------------------------------------
 		//  sphere
 		//  -------------------------------------
 		geometry = new THREE.SphereGeometry( 1, 5, 5 );
-		material = new THREE.MeshBasicMaterial( { color: 0xFFFFFF, wireframe:false, transparent:true, opacity:.5 } )
-		
+		material = new THREE.MeshBasicMaterial( { color: 0xFFFFFF, wireframe:true, linewidth:.5 } )
 		
 		this.sphereBottom = new THREE.Mesh( geometry, material );
 		this.base.add(this.sphereBottom);
+
+		this.sphereTop = new THREE.Mesh( geometry, material );
+		// this.base.add(this.sphereTop);
 
 	};
 
@@ -400,12 +403,14 @@ LILYPAD.LilyPad3D = function(name) {
 		var i,total = this.customPlanes.length;
 		if (this.particles.visible===false){
 			this.particles.visible = true;
+			this.water.visible = false;
 			for(i=0;i<total;i++){
 				this.customWirePlanes[i].visible = true;
 				this.customPlanes[i].visible = false;
 			}
 		} else {
 			this.particles.visible = false;
+			this.water.visible = true;
 			for(i=0;i<total;i++){
 				this.customWirePlanes[i].visible = false;
 				this.customPlanes[i].visible = true;
@@ -449,12 +454,13 @@ LILYPAD.LilyPad3D = function(name) {
 		var isEven = null;
 
 		var centerX, centerY, centerZ;
-		geometry = this.particles.geometry;
-		id = 0;
 
 		var wrappOffset = (1-wrapAmount)*TWO_PI*.5;
 		var wrappMultiplier = (wrapAmount);
 		var a, b;
+
+		geometry = this.particles.geometry;
+		id = 0;
 
 		for(j = 0; j < this.totalVerticesV; j++) {
 			for(i = 0; i < this.totalVerticesH; i++) {
@@ -497,6 +503,7 @@ LILYPAD.LilyPad3D = function(name) {
 					// geometry.vertices[id].y = maxHeight; //heightCounter+heightExtra;
 					geometry.vertices[id].y = maxHeight + this.maxHeightCache[id][0]; //heightCounter+heightExtra;
 					geometry.vertices[id].z = Math.cos(percentage)*outerRadius + centerZ;
+
 				} else {
 					geometry.vertices[id].x = Math.sin(percentage)*outerRadius + centerX;
 					// geometry.vertices[id].y = this.maxHeightCache[id][this.maxHeightCacheSize-1]; //heightCounter+heightExtra;
@@ -557,26 +564,44 @@ LILYPAD.LilyPad3D = function(name) {
 		outerRadius = LILYPAD.Params.radius - LILYPAD.Params.radius*radiusRange;
 		for(j = 0; j < this.totalVerticesH; j++) {
 			percentage = j/(this.totalVerticesH-1)*TWO_PI;
-			this.sphereTop.geometry.vertices[j].x = Math.cos(percentage)*outerRadius + 0;
-			this.sphereTop.geometry.vertices[j].y = 200 + waterHeight;
-			this.sphereTop.geometry.vertices[j].z = Math.sin(percentage)*outerRadius + 0;
+
+
+			// percentage = ((i+this.count)/(this.totalVerticesH-1))*TWO_PI;
+			fold = this.perlin.noise3d( Math.cos(percentage)*noiseAmount, Math.sin(percentage)*noiseAmount, (this.count));
+			fold *= noiseIntensity*.5;
+
+			// spikes calculation
+			outerRadius = LILYPAD.Params.radius*1.125 - radiusRange * LILYPAD.Params.radius;
+			spikes = outerRadius - fold*outerRadius;
+			maxHeight = fold*multiplier;
+
+			this.halo.geometry.vertices[j].x = Math.cos(percentage)*outerRadius + 0;
+			this.halo.geometry.vertices[j].y = 200 + maxHeight;//200 + waterHeight;
+			this.halo.geometry.vertices[j].z = Math.sin(percentage)*outerRadius + 0;
 		}
 
-		scalar = 2;
-		this.sphereBottom.scale.set(scalar,scalar,scalar);
 		percentage = (this.centerCount)*TWO_PI;
 
+		fold = this.perlin.noise3d( Math.cos(percentage)*noiseAmount, Math.sin(percentage)*noiseAmount, (this.count));
+		fold *= noiseIntensity;
+		outerRadius = LILYPAD.Params.radius*1.125 - radiusRange * LILYPAD.Params.radius;
+		spikes = outerRadius - fold*outerRadius;
+		maxHeight = fold*multiplier*.5;
+
+		this.sphereTop.position.x = Math.cos(percentage)*outerRadius + 0;
+		this.sphereTop.position.y = 200 + maxHeight;//200+waterHeight;
+		this.sphereTop.position.z = Math.sin(percentage)*outerRadius + 0;
+
 		this.stirLine.geometry.vertices[0].x = centerX;
-		this.stirLine.geometry.vertices[0].y = waterHeight;
+		this.stirLine.geometry.vertices[0].y = 200 + maxHeight;
 		this.stirLine.geometry.vertices[0].z = centerZ;
 
-		this.stirLine.geometry.vertices[1].x = Math.cos(percentage)*outerRadius + 0;
-		this.stirLine.geometry.vertices[1].y = 200+waterHeight;
-		this.stirLine.geometry.vertices[1].z = Math.sin(percentage)*outerRadius + 0;
-
+		this.stirLine.geometry.vertices[1].x = this.sphereTop.position.x;
+		this.stirLine.geometry.vertices[1].y = this.sphereTop.position.y;
+		this.stirLine.geometry.vertices[1].z = this.sphereTop.position.z;
 
 		this.sphereBottom.position.x = centerX;
-		this.sphereBottom.position.y = waterHeight;
+		this.sphereBottom.position.y = 200 + maxHeight;
 		this.sphereBottom.position.z = centerZ;
 
 
@@ -585,6 +610,8 @@ LILYPAD.LilyPad3D = function(name) {
 
 		// changes the y position of the ground relative to shape
 		this.water.position.y = waterHeight;
+
+		// this.particles.position.y = 100;
 	};
 
 	this.draw = function() {
@@ -597,7 +624,7 @@ LILYPAD.LilyPad3D = function(name) {
 		// update particles
 		this.particles.geometry.verticesNeedUpdate = true;
 		
-		this.sphereTop.geometry.verticesNeedUpdate = true;
+		this.halo.geometry.verticesNeedUpdate = true;
 		this.stirLine.geometry.verticesNeedUpdate = true;
 
 		// update shapes

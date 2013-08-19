@@ -70,10 +70,11 @@ LILYPAD.Params = function(name) {
 			return false;
 		};
 
-		var f1 = this.gui.addFolder('PARAMETERS');
+		var f1 = this.gui.addFolder('LILYPAD');
+		var f2 = this.gui.addFolder('GLOBAL');
 
-		LILYPAD.Sliders.speed = f1.add(LILYPAD.Params, 'speed', 0.1, 5.0).step(0.0005).name('speed');
-		LILYPAD.Sliders.delay = f1.add(LILYPAD.Params, 'delay', 0.0, 5.0).step(0.0005).name('delay');
+		LILYPAD.Sliders.speed = f2.add(LILYPAD.Params, 'speed', 0.1, 5.0).step(0.0005).name('speed');
+		LILYPAD.Sliders.delay = f2.add(LILYPAD.Params, 'delay', 0.0, 2.0).step(0.0005).name('delay');
 
 		LILYPAD.Sliders.noiseSpeed = f1.add(LILYPAD.Params, 'noiseSpeed', -.35, .35).step(0.0005).name('noiseSpeed');
 		LILYPAD.Sliders.noiseAmount = f1.add(LILYPAD.Params, 'noiseAmount', 0, 5).step(0.0005).name('noiseAmount');
@@ -99,9 +100,9 @@ LILYPAD.Params = function(name) {
 		LILYPAD.Sliders.colorRange = f1.add(LILYPAD.Params, 'colorRange', .0, .35).step(0.0005).name('colorRange');
 
 		this.gui.add(LILYPAD.Params, 'randomizeAllValues').name('MORPH SHAPE');
-		this.gui.add(LILYPAD.Params, 'randomizeColor').name('UPDATE COLOR');
-		this.gui.add(LILYPAD.Params, 'randomizeTotalNumbers').name('CHANGE RES');
-		this.gui.add(LILYPAD.Params, 'toggleView').name('CHANGE VIEW');
+		f2.add(LILYPAD.Params, 'randomizeColor').name('UPDATE COLOR');
+		// f2.add(LILYPAD.Params, 'randomizeTotalNumbers').name('CHANGE RES');
+		f2.add(LILYPAD.Params, 'toggleView').name('CHANGE VIEW');
 
 		this.guiContainer = document.getElementById('guiContainer');
 		this.guiContainer.appendChild(this.gui.domElement);
