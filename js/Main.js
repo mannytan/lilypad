@@ -49,13 +49,14 @@ LILYPAD.Main = function(name) {
 		this.lilyPad3D.init();
 		this.lilyPad3D.setDimensions(this.stageWidth,this.stageHeight);
 		this.lilyPad3D.createEnvironment();
-		this.lilyPad3D.createBackgroundElements();
-		this.lilyPad3D.createForegroundElements();
-		this.lilyPad3D.createListeners();
+		this.lilyPad3D.createLights();
+		this.lilyPad3D.createSecondaryElements();
+		this.lilyPad3D.createPrimaryElements();
+		// this.lilyPad3D.createListeners();
 		
 
 		this.gui.set3DScope(this.lilyPad3D);
-		// this.gui.createListeners();
+		this.gui.createListeners();
 
 		this.loader = document.getElementById('loader');
 		// document.body.appendChild(this.stats.domElement);

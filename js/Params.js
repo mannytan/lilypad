@@ -77,7 +77,7 @@ LILYPAD.Params = function(name) {
 		LILYPAD.Sliders.delay = f2.add(LILYPAD.Params, 'delay', 0.0, 2.0).step(0.0005).name('delay');
 
 		LILYPAD.Sliders.noiseSpeed = f1.add(LILYPAD.Params, 'noiseSpeed', -.35, .35).step(0.0005).name('noiseSpeed');
-		LILYPAD.Sliders.noiseAmount = f1.add(LILYPAD.Params, 'noiseAmount', 0, 5).step(0.0005).name('noiseAmount');
+		LILYPAD.Sliders.noiseAmount = f1.add(LILYPAD.Params, 'noiseAmount', 0, 3).step(0.0005).name('noiseAmount');
 		LILYPAD.Sliders.noiseIntensity = f1.add(LILYPAD.Params, 'noiseIntensity', .25, 2).step(0.0005).name('noiseIntensity');
 		
 		LILYPAD.Sliders.radiusRange = f1.add(LILYPAD.Params, 'radiusRange', .75, 1).step(0.0005).name('radiusRange');
