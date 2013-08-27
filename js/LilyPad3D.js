@@ -55,12 +55,15 @@ LILYPAD.LilyPad3D = function(name) {
 	this.halo = null;
 	this.haloDot = null;
 
+	// ---------------------------------------------------------
+	// instantiation
+	// ---------------------------------------------------------
+
 	this.init = function() {
 		this.traceFunction("init");
 
 		// this.perlin = new ClassicalNoise();
 		this.perlin = new SimplexNoise();
-
 		return this;
 	};
 
@@ -104,6 +107,7 @@ LILYPAD.LilyPad3D = function(name) {
 		this.container = document.getElementById('container3D');
 		this.container.appendChild(this.renderer.domElement);
 
+		return this;
 	};
 
 	this.createLights = function() {
@@ -118,7 +122,7 @@ LILYPAD.LilyPad3D = function(name) {
 
 		this.dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
 		// this.dirLight.color.setHSL( 0.1, 1, 0.95 );
-		this.dirLight.position.set( -1, 1.75, 1 );
+		this.dirLight.position.set( -2.5, 2.5, 2.5 );
 		this.dirLight.position.multiplyScalar( 100 );
 		this.scene.add( this.dirLight );
 
@@ -137,6 +141,8 @@ LILYPAD.LilyPad3D = function(name) {
 		this.dirLight.shadowBias = -0.0001;
 		this.dirLight.shadowDarkness = 0.35;
 		// this.dirLight.shadowCameraVisible = true;
+
+		return this;
 	};
 
 	this.createListeners = function() {
@@ -144,8 +150,68 @@ LILYPAD.LilyPad3D = function(name) {
 			scope.onDocumentMouseDown(event);
 		}, false);
 		
+		return this;
 	};
 
+	this.createPrimaryElements = function() {
+
+		var i,j,k,id,
+			particle,
+			faceNormal, 
+			geometry, 
+			material;
+
+		var percentage;
+
+		// backbone dots
+		material = new THREE.ParticleBasicMaterial( { color: 0xFFFFFF, size: 1} );
+		geometry = new THREE.Geometry();
+		for(i = 0; i < this.totalVertices; i++) {
+			geometry.vertices.push(new THREE.Vector3());
+		}
+		
+		this.particles = new THREE.ParticleSystem( geometry, material );
+		this.base.add(this.particles);
+		this.particles.visible = false;
+
+		var colorSpeed = LILYPAD.Params.colorSpeed;
+		var colorRange = LILYPAD.Params.colorRange;
+
+		this.customPlanes = [];
+		for(i = 0; i < this.totalPlanesV; i++) {
+			geometry = this.getCustomGeometry(this.totalPlanesH, i, i*30, 30);
+			// main plane
+			material = new THREE.MeshLambertMaterial( { 
+				ambient: 0x000000, 
+				color: new THREE.Color().setHSL( (i/this.totalPlanesV*colorRange + colorSpeed)%1 , 1, .5), 
+				specular: 0x336699, 
+				shininess: 30, 
+				shading: THREE.SmoothShading,
+				side:THREE.DoubleSide
+			});
+
+			customPlane = new THREE.Mesh( geometry, material );
+			customPlane.castShadow = true;
+			customPlane.receiveShadow = true;
+			this.base.add(customPlane);
+			this.customPlanes.push(customPlane);
+		}
+
+		var cache = [];
+		for(i = 0; i < this.maxHeightCacheSize; i++) {
+			cache.push(0);
+		};
+		this.maxHeightCache = [];
+		var id = 0;
+		for(j = 0; j < this.totalVerticesV; j++) {
+			for(i = 0; i < this.totalVerticesH; i++) {
+				this.maxHeightCache.push(cache.slice());
+				id++;
+			}
+		}
+
+		return this;
+	};
 
 	this.createSecondaryElements = function() {
 
@@ -226,68 +292,13 @@ LILYPAD.LilyPad3D = function(name) {
 		this.haloDot = new THREE.Mesh( geometry, material );
 		this.base.add(this.haloDot);
 
+		return this;
 	};
 
-	this.createPrimaryElements = function() {
 
-		var i,j,k,id,
-			particle,
-			faceNormal, 
-			geometry, 
-			material;
-
-		var percentage;
-
-		// backbone dots
-		material = new THREE.ParticleBasicMaterial( { color: 0xFFFFFF, size: 1} );
-		geometry = new THREE.Geometry();
-		for(i = 0; i < this.totalVertices; i++) {
-			geometry.vertices.push(new THREE.Vector3());
-		}
-		
-		this.particles = new THREE.ParticleSystem( geometry, material );
-		this.base.add(this.particles);
-		this.particles.visible = false;
-
-		var colorSpeed = LILYPAD.Params.colorSpeed;
-		var colorRange = LILYPAD.Params.colorRange;
-
-		this.customPlanes = [];
-		for(i = 0; i < this.totalPlanesV; i++) {
-			geometry = this.getCustomGeometry(this.totalPlanesH, i, i*30, 30);
-			// main plane
-			material = new THREE.MeshLambertMaterial( { 
-				ambient: 0x000000, 
-				color: new THREE.Color().setHSL( (i/this.totalPlanesV*colorRange + colorSpeed)%1 , 1, .5), 
-				specular: 0x336699, 
-				shininess: 30, 
-				shading: THREE.SmoothShading,
-				side:THREE.DoubleSide
-			});
-
-			customPlane = new THREE.Mesh( geometry, material );
-			customPlane.castShadow = true;
-			customPlane.receiveShadow = true;
-			this.base.add(customPlane);
-			this.customPlanes.push(customPlane);
-		}
-
-		var cache = [];
-		for(i = 0; i < this.maxHeightCacheSize; i++) {
-			cache.push(0);
-		};
-		this.maxHeightCache = [];
-		var id = 0;
-		for(j = 0; j < this.totalVerticesV; j++) {
-			for(i = 0; i < this.totalVerticesH; i++) {
-				this.maxHeightCache.push(cache.slice());
-				id++;
-			}
-		}
-
-
-	};
-
+	// ---------------------------------------------------------
+	// utility
+	// ---------------------------------------------------------
 
 	// strip order is based on fold direction
 	// 
@@ -353,6 +364,31 @@ LILYPAD.LilyPad3D = function(name) {
 		return geometry;
 	};
 
+	// ---------------------------------------------------------
+	// listeners
+	// ---------------------------------------------------------
+	this.onDocumentMouseDown = function(event) {
+		this.traceFunction("onDocumentMouseDown");
+		event.preventDefault();
+
+		var mouse = new THREE.Vector2();
+		mouse.x = ( event.clientX / (window.innerWidth-LILYPAD.Params.guiWidth) ) * 2 - 1;
+		mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+		var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 );
+		this.projector.unprojectVector( vector, this.camera );
+		var raycaster = new THREE.Raycaster( this.camera.position, vector.sub( this.camera.position ).normalize() );
+		var intersects = raycaster.intersectObjects( [this.water] );
+		if ( intersects.length > 0 ) {
+			this.dispatchEvent("MORPH_SHAPE",[]);
+		} else {
+
+		}
+	};
+
+	// ---------------------------------------------------------
+	// public functions
+	// ---------------------------------------------------------
+	
 	this.parse = function() {
 		var i,j,k,id,
 			particle,
@@ -378,7 +414,6 @@ LILYPAD.LilyPad3D = function(name) {
 		var maxHeight = 0;
 
 		var heightCountIncrement = (multiplier*2-multiplier)
-
 		var heightOffset = LILYPAD.Params.heightOffset;
 		var maxHeightRange = LILYPAD.Params.maxHeightRange;
 		var heightCounter = -(this.totalVerticesV-1)*.5 * heightCountIncrement;
@@ -402,7 +437,7 @@ LILYPAD.LilyPad3D = function(name) {
 				// fold specifically meant to account for tiling along a polar/clynidrical map
 				// http://www.sjeiti.com/creating-tileable-noise-maps/
 				percentage = ((i+this.count)/(this.totalVerticesH-1))*TWO_PI;
-				fold = this.perlin.noise3d( Math.cos(percentage)*noiseAmount, Math.sin(percentage)*noiseAmount, (j/this.totalVerticesV+this.count));
+				fold = this.perlin.noise3d( Math.cos(percentage)*noiseAmount+this.count*.1, Math.sin(percentage)*noiseAmount, (j/this.totalVerticesV+this.count*.1));
 				fold *= noiseIntensity;
 
 				// spikes calculation
@@ -539,15 +574,15 @@ LILYPAD.LilyPad3D = function(name) {
 		this.dirLight.position.x = Math.cos(percentage)*100;
 		this.dirLight.position.z = Math.sin(percentage)*100;
 
+		return this;
 	};
 
 	this.draw = function() {
 
-		// updates light postion
-
 		// update particles
 		this.particles.geometry.verticesNeedUpdate = true;
 		
+		// updates halo
 		this.halo.geometry.verticesNeedUpdate = true;
 		this.haloLine.geometry.verticesNeedUpdate = true;
 
@@ -559,11 +594,11 @@ LILYPAD.LilyPad3D = function(name) {
 		
 		this.controls.update();
 		this.renderer.render( this.scene , this.camera );
+
+		return this;
 	};
 
-
 	this.toggleWireFrame = function(){
-
 		var i,total = this.customPlanes.length;
 		if (this.particles.visible===false){
 			this.particles.visible = true;
@@ -582,26 +617,6 @@ LILYPAD.LilyPad3D = function(name) {
 		}
 
 	};
-
-	// listeners
-	this.onDocumentMouseDown = function(event) {
-		this.traceFunction("onDocumentMouseDown");
-		event.preventDefault();
-
-		var mouse = new THREE.Vector2();
-		mouse.x = ( event.clientX / (window.innerWidth-LILYPAD.Params.guiWidth) ) * 2 - 1;
-		mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-		var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 );
-		this.projector.unprojectVector( vector, this.camera );
-		var raycaster = new THREE.Raycaster( this.camera.position, vector.sub( this.camera.position ).normalize() );
-		var intersects = raycaster.intersectObjects( [this.water] );
-		if ( intersects.length > 0 ) {
-			this.dispatchEvent("MORPH_SHAPE",[]);
-		} else {
-
-		}
-	};
-
 	this.enableTrackBall = function() {
 		this.controls.enabled = true;
 	};

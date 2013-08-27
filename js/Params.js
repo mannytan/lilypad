@@ -43,7 +43,7 @@ LILYPAD.Params = function(name) {
 			colorSpeed:.0001,
 			colorRange:.125,
 			wrapAmount: 1.0,
-			delay: 0.001,
+			delay: 0.150,
 			randomizeAllValues: function(){
 				scope.randomizeAllValues();
 			},
@@ -130,7 +130,7 @@ LILYPAD.Params = function(name) {
 		return {
 			time:delayValue,
 			duration:LILYPAD.Params.speed,
-			effect:'expoInOut', 
+			effect:'quadInOut', 
 			start:param,
 			stop:endValue,
 			onFrame:setter,
