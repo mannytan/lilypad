@@ -1,4 +1,4 @@
-Fold
+Lilypad
 ========
 
-This is a Three.js experiment based on some ghetto subdivision. Or at least that's what I think I'm building.
+Lily pad is an experiment that explores paper folding inspired by the form of a lily pad floating on top of water.
