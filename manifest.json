@@ -14,7 +14,7 @@
 			"touch" : true
 			},
 			"instructions" : "click to morph shape",
-			"colour_scheme" : "rainbow",
+			"colour_scheme" : "dark",
 			"mobile_friendly" : false,
 			"slug" : "mannytan/lilypad/tree/codedoodles"
 		}
