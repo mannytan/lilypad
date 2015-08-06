@@ -4,103 +4,103 @@
  * Date: 03/20/12
  */
 
-var LILYPAD = LILYPAD || {};
+ var LILYPAD = LILYPAD || {};
 
-LILYPAD.Params = {};
-LILYPAD.Sliders = {};
+ LILYPAD.Params = {};
+ LILYPAD.Sliders = {};
 
-LILYPAD.Params = function(name) {
-	var scope = this;
+ LILYPAD.Params = function(name) {
+ 	var scope = this;
 
-	UNCTRL.BoilerPlate.call(this);
+ 	UNCTRL.BoilerPlate.call(this);
 
-	this.name = 'Params';
-	this.scope3d = null;
+ 	this.name = 'Params';
+ 	this.scope3d = null;
 
-	this.init = function() {
-		this.traceFunction("init");
-		return this;
-	};
+ 	this.init = function() {
+ 		this.traceFunction("init");
+ 		return this;
+ 	};
 
-	this.createGui = function() {
+ 	this.createGui = function() {
 
-		LILYPAD.Params = {
-			orbitSpeed: 0.0015,
-			guiWidth: 250,
-			radius: 200,
-			radiusRange: .75,
-			centerRadius: 10,
-			centerSpeed: 0.1,
-			centerOffset: 0.001,
-			multiplier: 10.0005,
-			heightOffset: 10,
-			waterHeight: 10,
-			maxHeightRange: 1,
-			noiseSpeed: .05,
-			noiseAmount: .3,
-			noiseIntensity:1,
-			speed: 3.25,
-			colorSpeed:.0001,
-			colorRange:.125,
-			wrapAmount: 1.0,
-			delay: 0.150,
-			randomizeAllValues: function(){
-				scope.randomizeAllValues();
-			},
-			randomizeColor: function(){
-				scope.randomizeColor();
-			},
-			toggleView: function(){
-				scope.toggleView();
-			},
-			randomizeTotalNumbers: function(){
-				scope.randomizeTotalNumbers();
-			}
+ 		LILYPAD.Params = {
+ 			orbitSpeed: 0.0015,
+ 			guiWidth: 0,
+ 			radius: 200,
+ 			radiusRange: .75,
+ 			centerRadius: 10,
+ 			centerSpeed: 0.1,
+ 			centerOffset: 0.001,
+ 			multiplier: 10.0005,
+ 			heightOffset: 10,
+ 			waterHeight: 10,
+ 			maxHeightRange: 1,
+ 			noiseSpeed: .05,
+ 			noiseAmount: .3,
+ 			noiseIntensity:1,
+ 			speed: 3.25,
+ 			colorSpeed:.0001,
+ 			colorRange:.125,
+ 			wrapAmount: 1.0,
+ 			delay: 0.150,
+ 			randomizeAllValues: function(){
+ 				scope.randomizeAllValues();
+ 			},
+ 			randomizeColor: function(){
+ 				scope.randomizeColor();
+ 			},
+ 			toggleView: function(){
+ 				scope.toggleView();
+ 			},
+ 			randomizeTotalNumbers: function(){
+ 				scope.randomizeTotalNumbers();
+ 			}
 
-		};
+ 		};
 
-		this.gui = new dat.GUI({
-			width: LILYPAD.Params.guiWidth,
+ 		this.gui = new dat.GUI({
+ 			width: LILYPAD.Params.guiWidth,
 			// autoPlace: false
 		});
 
-		this.guiContainer = this.gui.domElement;
+ 		this.guiContainer = this.gui.domElement;
 
-		this.guiContainer.onselectStart = function() {
-			return false;
-		};
+ 		this.guiContainer.onselectStart = function() {
+ 			return false;
+ 		};
 
-		var f1 = this.gui.addFolder('LILYPAD');
-		var f2 = this.gui.addFolder('GLOBAL');
+ 		var f1 = this.gui.addFolder('LILYPAD');
+ 		var f2 = this.gui.addFolder('GLOBAL');
 
-		LILYPAD.Sliders.speed = f2.add(LILYPAD.Params, 'speed', 0.1, 5.0).step(0.0005).name('speed');
-		LILYPAD.Sliders.delay = f2.add(LILYPAD.Params, 'delay', 0.0, 2.0).step(0.0005).name('delay');
+ 		LILYPAD.Sliders.speed = f2.add(LILYPAD.Params, 'speed', 0.1, 5.0).step(0.0005).name('speed');
+ 		LILYPAD.Sliders.delay = f2.add(LILYPAD.Params, 'delay', 0.0, 2.0).step(0.0005).name('delay');
 
-		LILYPAD.Sliders.noiseSpeed = f1.add(LILYPAD.Params, 'noiseSpeed', -.35, .35).step(0.0005).name('noiseSpeed');
-		LILYPAD.Sliders.noiseAmount = f1.add(LILYPAD.Params, 'noiseAmount', 0, 3).step(0.0005).name('noiseAmount');
-		LILYPAD.Sliders.noiseIntensity = f1.add(LILYPAD.Params, 'noiseIntensity', .25, 2).step(0.0005).name('noiseIntensity');
-		
-		LILYPAD.Sliders.radiusRange = f1.add(LILYPAD.Params, 'radiusRange', .75, 1).step(0.0005).name('radiusRange');
-		LILYPAD.Sliders.radius = f1.add(LILYPAD.Params, 'radius', 100, 400).step(0.0005).name('radius');
+ 		LILYPAD.Sliders.noiseSpeed = f1.add(LILYPAD.Params, 'noiseSpeed', -.35, .35).step(0.0005).name('noiseSpeed');
+ 		LILYPAD.Sliders.noiseAmount = f1.add(LILYPAD.Params, 'noiseAmount', 0, 3).step(0.0005).name('noiseAmount');
+ 		LILYPAD.Sliders.noiseIntensity = f1.add(LILYPAD.Params, 'noiseIntensity', .25, 2).step(0.0005).name('noiseIntensity');
+ 		
+ 		LILYPAD.Sliders.radiusRange = f1.add(LILYPAD.Params, 'radiusRange', .75, 1).step(0.0005).name('radiusRange');
+ 		LILYPAD.Sliders.radius = f1.add(LILYPAD.Params, 'radius', 100, 400).step(0.0005).name('radius');
 
-		LILYPAD.Sliders.centerRadius = f1.add(LILYPAD.Params, 'centerRadius', 0, 25).step(0.0005).name('centerRadius');
-		LILYPAD.Sliders.centerSpeed = f1.add(LILYPAD.Params, 'centerSpeed', -.1, .1).step(0.0005).name('centerSpeed');
-		LILYPAD.Sliders.centerOffset = f1.add(LILYPAD.Params, 'centerOffset', -2, 2).step(0.0005).name('centerOffset');
+ 		LILYPAD.Sliders.centerRadius = f1.add(LILYPAD.Params, 'centerRadius', 0, 25).step(0.0005).name('centerRadius');
+ 		LILYPAD.Sliders.centerSpeed = f1.add(LILYPAD.Params, 'centerSpeed', -.1, .1).step(0.0005).name('centerSpeed');
+ 		LILYPAD.Sliders.centerOffset = f1.add(LILYPAD.Params, 'centerOffset', -2, 2).step(0.0005).name('centerOffset');
 
-		LILYPAD.Sliders.multiplier = f1.add(LILYPAD.Params, 'multiplier', -15, 15).step(0.0005).name('multiplier');
-		LILYPAD.Sliders.maxHeightRange = f1.add(LILYPAD.Params, 'maxHeightRange', -1, 1).step(0.0005).name('maxHeightRange');
-		
-		LILYPAD.Sliders.heightOffset = f1.add(LILYPAD.Params, 'heightOffset', -50, 50).step(0.0005).name('heightOffset');
-		LILYPAD.Sliders.waterHeight = f1.add(LILYPAD.Params, 'waterHeight', -100, 50).step(0.0005).name('waterHeight');
+ 		LILYPAD.Sliders.multiplier = f1.add(LILYPAD.Params, 'multiplier', -15, 15).step(0.0005).name('multiplier');
+ 		LILYPAD.Sliders.maxHeightRange = f1.add(LILYPAD.Params, 'maxHeightRange', -1, 1).step(0.0005).name('maxHeightRange');
+ 		
+ 		LILYPAD.Sliders.heightOffset = f1.add(LILYPAD.Params, 'heightOffset', -50, 50).step(0.0005).name('heightOffset');
+ 		LILYPAD.Sliders.waterHeight = f1.add(LILYPAD.Params, 'waterHeight', -100, 50).step(0.0005).name('waterHeight');
 
-		LILYPAD.Sliders.wrapAmount = f1.add(LILYPAD.Params, 'wrapAmount', 0, 1).step(0.0005).name('wrapAmount');
-		LILYPAD.Sliders.orbitSpeed = f1.add(LILYPAD.Params, 'orbitSpeed', -.1, .1).step(0.0005).name('orbitSpeed');
+ 		LILYPAD.Sliders.wrapAmount = f1.add(LILYPAD.Params, 'wrapAmount', 0, 1).step(0.0005).name('wrapAmount');
+ 		LILYPAD.Sliders.orbitSpeed = f1.add(LILYPAD.Params, 'orbitSpeed', -.1, .1).step(0.0005).name('orbitSpeed');
 
-		LILYPAD.Sliders.colorSpeed = f1.add(LILYPAD.Params, 'colorSpeed', -.001, .001).step(0.0005).name('colorSpeed');
-		LILYPAD.Sliders.colorRange = f1.add(LILYPAD.Params, 'colorRange', .0, .35).step(0.0005).name('colorRange');
+ 		LILYPAD.Sliders.colorSpeed = f1.add(LILYPAD.Params, 'colorSpeed', -.001, .001).step(0.0005).name('colorSpeed');
+ 		LILYPAD.Sliders.colorRange = f1.add(LILYPAD.Params, 'colorRange', .0, .35).step(0.0005).name('colorRange');
 
-		this.gui.add(LILYPAD.Params, 'randomizeAllValues').name('MORPH SHAPE');
-		f2.add(LILYPAD.Params, 'randomizeColor').name('UPDATE COLOR');
+ 		this.gui.add(LILYPAD.Params, 'randomizeAllValues').name('MORPH SHAPE');
+ 		f2.add(LILYPAD.Params, 'randomizeColor').name('UPDATE COLOR');
 		// f2.add(LILYPAD.Params, 'randomizeTotalNumbers').name('CHANGE RES');
 		f2.add(LILYPAD.Params, 'toggleView').name('CHANGE VIEW');
 

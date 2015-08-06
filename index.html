@@ -4,31 +4,29 @@
 
 <head>
 	<title>uncontrol :: lilyPad</title>
-    <!-- css -->
+	<!-- css -->
 	<link type="text/css" href="./css/styles.css" rel="stylesheet"/>
- 
-    <!-- utils -->
+
+	<!-- utils -->
 	<script src="./vendor/jquery-1.7.1.min.js"></script>
 	<script src="./vendor/Stats.js"></script>
 	<script src="./vendor/perlin-noise-simplex.js"></script>
 	<script src="./vendor/perlin-noise-classical.js"></script>
 
-
-
 	<script type="text/javascript" src="./vendor/RequestAnimationFrame.js"></script>
-    <script type="text/javascript" src="./vendor/jstween-1.0.min.js"></script>
+	<script type="text/javascript" src="./vendor/jstween-1.0.min.js"></script>
 	<script type="text/javascript" src="./vendor/dat.gui.min.js"></script>
 
-    <!-- 3d -->
+	<!-- 3d -->
 	<script type="text/javascript" src="./vendor/three/three.min.js"></script>
 	<script type="text/javascript" src="./vendor/three/controls/TrackballControls.js"></script>
 
-    <!-- boilerplate -->
+	<!-- boilerplate -->
 	<script type="text/javascript" src="./vendor/un/BoilerPlate.js"></script>
 	<script type="text/javascript" src="./vendor/un/Trace.js"></script>
 	<script type="text/javascript" src="./vendor/un/Utils.js"></script>
 
-    <!-- custom -->
+	<!-- custom -->
 	<script type="text/javascript" src="./js/Params.js"></script>
 	<script type="text/javascript" src="./js/Main.js"></script>
 	<script type="text/javascript" src="./js/LilyPad3D.js"></script>
@@ -39,7 +37,7 @@
 	$(document).ready(function() {
 
 		if(Modernizr.webgl) {
-		$('#notification').html("Drop experiment<br>Loading 6.7MB MP3 ...")
+			$('#notification').html("Drop experiment<br>Loading 6.7MB MP3 ...")
 			var lilyPad = new LILYPAD.Main();
 			lilyPad.init();
 		} else {
@@ -53,11 +51,10 @@
 
 <body>
 
-<div id="container3D"></div>
-<div id="guiContainer"></div>
-<div id="about">Lilypad is an experiment that uses paper folding methods as texture.<br><a href="http://www.uncontrol.com/posts/lily-pad-experiment/">uncontrol.com</a></div>
-<div id="proxyTimer"></div>
-<div id="proxy"></div>
+	<div id="container3D"></div>
+	<div id="guiContainer"></div>
+	<div id="proxyTimer"></div>
+	<div id="proxy"></div>
 </body>
 
 </html>

@@ -43,30 +43,18 @@ body {
 	position: absolute;
 	bottom: 0px;
 	left: 0px;
- }
+}
 
 #container3D {
 	position: absolute;
 }
 
 #guiContainer {
+	display:none;
 	position:absolute;
 	background-color: #111;
 	right:-15px;
 	height:100%;
-}
-#about {
-	font: 12px 'Lucida Grande', sans-serif;
-	position:absolute;
-	color:#999;
-	width:230px;
-	height:48px;
-	padding: 10px;
-	right:0px;
-}
-#about a {
-	color:#E61D5F;
-	text-decoration: none;
 }
 
 .close-button{

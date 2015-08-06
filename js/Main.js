@@ -4,16 +4,16 @@
  * Date: 03/20/12
  */
 
-var LILYPAD = LILYPAD || {};
+ var LILYPAD = LILYPAD || {};
 
 
-LILYPAD.Main = function(name) {
-	var scope = this;
+ LILYPAD.Main = function(name) {
+ 	var scope = this;
 
-	UNCTRL.BoilerPlate.call(this);
+ 	UNCTRL.BoilerPlate.call(this);
 
-	this.name = 'Main';
-	this.isPaused = false;
+ 	this.name = 'Main';
+ 	this.isPaused = false;
 
 	// stage
 	this.stageWidth = window.innerWidth - this.guiWidth;
@@ -53,7 +53,6 @@ LILYPAD.Main = function(name) {
 		this.lilyPad3D.createSecondaryElements();
 		this.lilyPad3D.createPrimaryElements();
 		// this.lilyPad3D.createListeners();
-		
 
 		this.gui.set3DScope(this.lilyPad3D);
 		this.gui.createListeners();
@@ -112,10 +111,10 @@ LILYPAD.Main = function(name) {
 	};
 
 	this.createListeners = function() {
-		window.addEventListener('keydown', function() {
-			scope.keyDown(event);
-		}, false);
 
+		window.addEventListener("click", function(){
+			LILYPAD.Params.randomizeAllValues();
+		}, false);
 		window.addEventListener('resize', function() {
 			scope.resize(event);
 		}, false);
@@ -134,9 +133,6 @@ LILYPAD.Main = function(name) {
 
 		this.lilyPad3D.setDimensions(this.stageWidth,this.stageHeight);
 		this.lilyPad3D.resize();
-
-		// this.stats.domElement.style.top = (10) + 'px';
-		// this.stats.domElement.style.right = (LILYPAD.Params.guiWidth + 10) + 'px';
 
 	};
 
